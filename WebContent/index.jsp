@@ -1,6 +1,4 @@
-<%@page import="java.awt.font.NumericShaper"%>
-<%@page import="org.bouncycastle.util.test.NumberParsing"%>
-<%@page import="com.nightox.q.generate.BasicPageGenerator"%><%@ page language="java" contentType="application/pdf" pageEncoding="ISO-8859-1"%><%
+<%@page import="java.awt.font.NumericShaper"%><%@page import="org.bouncycastle.util.test.NumberParsing"%><%@page import="com.nightox.q.generate.BasicPageGenerator"%><%@ page language="java" contentType="application/pdf" pageEncoding="ISO-8859-1"%><%
 
 BasicPageGenerator	generator = new BasicPageGenerator();
 

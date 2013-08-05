@@ -1,13 +1,16 @@
 [x] unify all links (youtube, soundcloud, etc) into one?
 [x] mobile site css
+[x] "facebook style" status instead of typed entry
+[x] debug upload a picture from phone
+
+[ ] add text field "empty" string prompt
+[ ] hebrew & special (&, etc) characters check on post & edit
 
 [ ] js field validation segments on upload
-[ ] add text field "empty" string prompt
-[ ] "facebook style" status instead of typed entry
-[ ] hebrew characters check on post
 
+[ ] adjust content and embed size to actual width of screen
+[ ] optimize display of short messages (centered, large fonts)
 
-[ ] debug upload a picture from phone
 [ ] picture upload progress
 
 [ ] add agreement to terms checkbox to upload
@@ -24,7 +27,6 @@
 [ ] move to other server
 
 [ ] lease management
-
 
 [ ] design fav icon
  

@@ -86,52 +86,7 @@
 		
 		<property name="services">
 			<bean class="com.nightox.q.beans.Services">
-				<property name="qTypeManager">
-					<bean class="com.nightox.q.types.QTypeManager">
-						<property name="typesList">
-							<list>
-								<bean class="com.nightox.q.types.spec.QNoteType">
-									<property name="displayName" value="Text Note"/>
-									<property name="dataType" value="text"/>
-									<property name="uploadFields">
-										<list>
-											<bean class="com.nightox.q.types.QTypeField">
-												<property name="name" value="title"/>
-												<property name="label" value="Title"/>
-											</bean>
-											<bean class="com.nightox.q.types.QTypeField">
-												<property name="name" value="note"/>
-												<property name="label" value="Note"/>
-												<property name="type" value="textarea"/>
-											</bean>
-										</list>
-									</property>
-								</bean>
-								<bean class="com.nightox.q.types.spec.QImageType">
-									<property name="displayName" value="Upload Image"/>
-									<property name="dataType" value="image"/>
-									<property name="uploadFields">
-										<list>
-											<bean class="com.nightox.q.types.QTypeField">
-												<property name="name" value="title"/>
-												<property name="label" value="Title"/>
-											</bean>
-											<bean class="com.nightox.q.types.QTypeField">
-												<property name="name" value="file"/>
-												<property name="label" value="Image"/>
-												<property name="type" value="file"/>
-											</bean>
-										</list>
-									</property>
-								</bean>
-								<bean parent="QListTypeBase">
-									<property name="displayName" value="Youtube/Vimeo/Soundcloud"/>
-									<property name="dataType" value="link"/>
-								</bean>
-							</list>
-						</property>
-					</bean>
-				</property>
+				<property name="htmlRenderer" ref="HtmlRenderer"/>
 			</bean>
 		</property>
 		
@@ -150,25 +105,16 @@
 		<property name="minUserRole" value="super"/>
 	</bean>
 
-	<bean id="QListTypeBase" class="com.nightox.q.types.spec.QLinkType">
-		<property name="uploadFields">
-			<list>
-				<bean class="com.nightox.q.types.QTypeField">
-					<property name="name" value="link"/>
-					<property name="label" value="Link"/>
-				</bean>
-			</list>
-		</property>
-		
+	<bean id="HtmlRenderer" class="com.nightox.q.html.HtmlRenderer">
 		<property name="specs">
 			<list>
 				<!-- youtube -->
 				<bean class="com.nightox.q.types.spec.QLinkTypeSpec">
-					<property name="pattern" value="^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&amp;\?]*).*"/>
+					<property name="pattern" value="(http:\/\/)?((www\.youtube\.com\/watch\?v=)|(youtu\.be\/))([a-zA-z0-9_\-]{11})([&amp;%-_0-9a-zA-Z\.]*)"/>
 					<property name="html">
 						<value>
 						<![CDATA[
-							<iframe width="560" height="315" src="//www.youtube.com/embed/$7" frameborder="0" allowfullscreen></iframe>
+							<iframe width="560" height="315" src="//www.youtube.com/embed/$5" frameborder="0" allowfullscreen></iframe>
 						]]>
 						</value>
 					</property>
@@ -188,8 +134,7 @@
 				
 				<!-- soundcloud -->
 				<bean class="com.nightox.q.types.spec.QLinkTypeSpec">
-					<property name="pattern" value="(https?:\/\/(?:www.)?soundcloud.com\/[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*(?!\/sets(?:\/|$))(?:\/[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*){1,2}\/?)"/>
-					<property name="find" value="true"/>
+					<property name="pattern" value="(https?:\/\/(?:www.)?soundcloud.com\/[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*(?!\/sets(?:\/|$))(?:\/[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*){1,2}\/?)([\?&amp;%-_0-9a-zA-Z\.]*)"/>
 					<property name="urlEncode" value="true"/>
 					<property name="html">
 						<value>

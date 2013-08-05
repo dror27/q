@@ -19,13 +19,4 @@
     <url-pattern>/q/*</url-pattern>
   </servlet-mapping>
 
-  <servlet>
-  	<servlet-name>DamnJSP</servlet-name>
-    <jsp-file>/pages/damn.jsp</jsp-file>
-  </servlet>
-  <servlet-mapping>
-  	<servlet-name>DamnJSP</servlet-name>
-    <url-pattern>/pages/damn</url-pattern>
-  </servlet-mapping>
-
 </web-app>

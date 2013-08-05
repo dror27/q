@@ -1,23 +1,15 @@
 package com.nightox.q.beans;
 
+import com.nightox.q.html.HtmlRenderer;
 import com.nightox.q.types.QManager;
-import com.nightox.q.types.QTypeManager;
 
 public class Services {
 	
-	private QTypeManager			qTypeManager;	
 	private QManager				qManager = new QManager();
+	private HtmlRenderer			htmlRenderer = new HtmlRenderer();
 	
 	public Services()
 	{
-	}
-
-	public QTypeManager getqTypeManager() {
-		return qTypeManager;
-	}
-
-	public void setqTypeManager(QTypeManager qTypeManager) {
-		this.qTypeManager = qTypeManager;
 	}
 
 	public QManager getqManager() {
@@ -26,6 +18,14 @@ public class Services {
 
 	public void setqManager(QManager qManager) {
 		this.qManager = qManager;
+	}
+
+	public HtmlRenderer getHtmlRenderer() {
+		return htmlRenderer;
+	}
+
+	public void setHtmlRenderer(HtmlRenderer htmlRenderer) {
+		this.htmlRenderer = htmlRenderer;
 	}
 	
 }

@@ -1,4 +1,4 @@
-<%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="com.nightox.q.types.QTypeField"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.types.IQType"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
+<%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
 
 // some constants
 final String		COOKIE_NAME = "Q_694601798f5a490e9a231f2805215e6b";
@@ -94,36 +94,26 @@ try
 		// must have upload field
 		if ( items.containsKey("upload") )
 		{
-			// extract type
-			String		dataType = items.get("type").getString();
-			IQType		qType = Factory.getServices().getqTypeManager().getQType(dataType);
-			if ( qType != null )
-			{
-				// build map of arguments with upload field names
-				Map<String, FileItem>	uploadItems = new LinkedHashMap<String, FileItem>();
-				for ( QTypeField field : qType.getUploadFields() )
-					uploadItems.put(field.getName(), items.get(qType.getDataType() + "_" + field.getName()));
-				
-				// clean
+			// process
+			if ( !items.containsKey("edit") )
 				q.cleanData();
-
-				// ask type to save
-				qType.setUploadItems(q, uploadItems);
-				
-				// save data type
-				q.setDataType(dataType);
-				
-				// redirect to view page
-				response.sendRedirect(q.getQ());
-				return;
+			q.setDataType("post");
+			q.setTextData(items.get("text").getString());
+			if ( items.containsKey("file") 
+						&& !StringUtils.isEmpty(items.get("file").getContentType()) 
+						&& items.get("file").getSize() > 0 )
+			{
+				q.setBinaryData(items.get("file").getInputStream());
+				q.setContentType(items.get("file").getContentType());
 			}
+			
+			
+			// redirect to view page
+			response.sendRedirect(q.getQ());
+			return;
 		}
 	}
 	
-	// map datatype
-	IQType		qType = null;
-	if ( q.getDataType() != null ) 
-		qType = Factory.getServices().getqTypeManager().getQType(q.getDataType());
 	
 	%><!DOCTYPE html>
 <!--[if IEMobile 7 ]>    <html class="no-js iem7"> <![endif]-->
@@ -167,94 +157,44 @@ try
     <body>
 
     <!-- Add your site or application content here -->
-<% if ( qType == null || request.getParameter("replace") != null ) { %>
+<% if ( q.getDataType() == null || request.getParameter("replace") != null || request.getParameter("edit") != null ) { %>
 	<div>
-		<% if ( request.getParameter("replace") != null ) { %>
+		<% if ( request.getParameter("replace") != null || request.getParameter("edit") != null ) { %>
 		<a href="<%=q.getQ()%>">cancel</a> |
 		<% } %>
-		<a href="<%=rootPath%>" target="_blank">create</a> (<a href="<%=rootPath%>?rows=2&cols=1" target="_blank">big</a>,<a href="<%=rootPath%>?rows=1&cols=1" target="_blank">huge</a>)
+		<a href="<%=rootPath%>" target="_blank">create more</a> (<a href="<%=rootPath%>?rows=2&cols=1" target="_blank">big</a>,<a href="<%=rootPath%>?rows=1&cols=1" target="_blank">huge</a>)
 	</div>
 
 	<div>
 	<h2><%=Factory.getConfProperty("html.fillMe") %></h2>
 	<form method="post" enctype="multipart/form-data" action="<%=q.getQ()%>">
 	<input type="hidden" name="upload" value="1"/>
-	<table>
-		
-		<tr>
-			<th>Type:</th>
-			<td>
-				<select name="type" id="type" onchange="javascript:updateUploadFields()">
-					<% for ( Map.Entry<String,String> entry : Factory.getServices().getqTypeManager().getDisplayNamesMap().entrySet() ) { %>
-						<option value="<%=entry.getKey()%>"><%=entry.getValue()%></option>
-					<% } %>
-				</select>
-			</td>
-		</tr>
-		
-		<% 
-		for ( IQType type : Factory.getServices().getqTypeManager().getQTypes() ) 
-		{
-			if ( type.getUploadFields() != null )
-				for ( QTypeField field : type.getUploadFields() )
-				{
-					String			name = type.getDataType() + "_" + field.getName();
-					%>
-						<tr x-type="<%=type.getDataType()%>" style="display:none">
-						<th><%=field.getLabel()%>:</th>
-						<td>
-					<%
-					if ( field.getType().equals("textarea") )
-					{
-						%>
-						<textarea name="<%=name%>" id="<%=name%>"></textarea>
-						<%
-					}
-					else
-					{
-						%>
-						<input name="<%=name%>" id="<%=name%>" type="<%=field.getType()%>"/>
-						<%
-					}
-					%>
-						</td>
-					<%
-				}
-		}
-		%>		
-		<tr>
-			<td/>
-			<td>
-				<input type="submit" name="post" value="Post"/>
-			</td>
-		</tr>
-	</table>
-	</form>
-	<script language="javascript">
-	function updateUploadFields()
-	{
-		var			type = $("#type")[0].value;
-		
-		$.each($('[x-type]'), function(index, elem) {
-			
-			if ( elem.getAttribute("x-type") == type )
-				elem.style.display="";
-			else
-				elem.style.display="none";
-			
-		});
-		
+	<%
+	if ( q.getTextData() != null && request.getParameter("edit") != null ) {
+		%><input type="hidden" name="edit" value="1"/><%
 	}
-	</script>
+	%>
+	
+	<textarea id="text" name="text" cols="40" rows="4" placeholder="type text here"><%
+	if ( q.getTextData() != null && request.getParameter("edit") != null ) {
+		%><%=q.getTextData()%><%
+	}
+	%></textarea>
+	<br/>
+	Image: <input id="file" name="file" type="file" placeholder="upload image here">
+	<br/>
+	<input type="submit" name="post" value="Post"/>
+	</form>
 	</div>
 <% } else { %>
 	<div>
 		<a href="<%=q.getQ()%>?replace">replace</a> |	
+		<a href="<%=q.getQ()%>?edit">edit</a> |	
 		<a href="<%=q.getQ()%>?clear">clear</a> |	
-		<a href="<%=rootPath%>" target="_blank">create</a> (<a href="<%=rootPath%>?rows=2&cols=1" target="_blank">big</a>,<a href="<%=rootPath%>?rows=1&cols=1" target="_blank">huge</a>)
+		<a href="<%=rootPath%>" target="_blank">create more</a> (<a href="<%=rootPath%>?rows=2&cols=1" target="_blank">big</a>,<a href="<%=rootPath%>?rows=1&cols=1" target="_blank">huge</a>)
 	</div>
 	<div>
-		<%=qType.renderHtml(q)%>
+		<%=Factory.getServices().getHtmlRenderer().renderHtml(q)%>
 	</div>
 <% } %>
 
@@ -265,7 +205,7 @@ try
 
 		<script>
 		Zepto(function($){
-			  updateUploadFields();
+			  // init code goes here
 			})
 		</script>
 

@@ -1,33 +1,37 @@
+-- high priority --
+
+-- done --
 [x] unify all links (youtube, soundcloud, etc) into one?
 [x] mobile site css
 [x] "facebook style" status instead of typed entry
 [x] debug upload a picture from phone
+[x] add text field "empty" string prompt (placeholder)
+[x] hebrew & special (&, etc) characters check on post & edit
 
-[ ] add text field "empty" string prompt
-[ ] hebrew & special (&, etc) characters check on post & edit
-
-[ ] js field validation segments on upload
-
+-- html/design --
 [ ] adjust content and embed size to actual width of screen
 [ ] optimize display of short messages (centered, large fonts)
+[ ] make fonts ok for phone
+[ ] design fav icon
+[ ] design custom image for qrcode center
 
+-- usability --
+[ ] js field validation segments on upload
 [ ] picture upload progress
 
+-- legal -- 
 [ ] add agreement to terms checkbox to upload
 
+-- business logic --
 [ ] add post upload page for setting protection period (free=4 hours, email=24 hours, pay=more)
 [ ] add location acquisition code
-[ ] add access log file (w/ cookie, location, etc)
-
 [ ] allow posting user to change before period is over
-
 [ ] make period suitable for daily or hourly maintenance (24+slack, etc)
-
-[ ] make fonts ok for phone
-[ ] move to other server
-
 [ ] lease management
 
-[ ] design fav icon
- 
-[ ] design custom image for qrcode center
+-- non functional --
+[ ] add access log file (w/ cookie, location, etc)
+
+-- deploy --
+[ ] move to other server
+

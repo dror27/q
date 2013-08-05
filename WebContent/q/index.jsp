@@ -1,4 +1,4 @@
-<%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
+<%@page import="org.apache.commons.lang.StringEscapeUtils"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
 
 // some constants
 final String		COOKIE_NAME = "Q_694601798f5a490e9a231f2805215e6b";
@@ -98,7 +98,7 @@ try
 			if ( !items.containsKey("edit") )
 				q.cleanData();
 			q.setDataType("post");
-			q.setTextData(items.get("text").getString());
+			q.setTextData(items.get("text").getString("UTF-8"));
 			if ( items.containsKey("file") 
 						&& !StringUtils.isEmpty(items.get("file").getContentType()) 
 						&& items.get("file").getSize() > 0 )
@@ -120,6 +120,7 @@ try
 <!--[if (gt IEMobile 7)|!(IEMobile)]><!--> <html class="no-js"> <!--<![endif]-->
     <head>
         <meta charset="utf-8">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <title><%=Factory.getConfProperty("html.pageTitle")%></title>
         <meta name="description" content="">
         <meta name="HandheldFriendly" content="True">
@@ -167,7 +168,7 @@ try
 
 	<div>
 	<h2><%=Factory.getConfProperty("html.fillMe") %></h2>
-	<form method="post" enctype="multipart/form-data" action="<%=q.getQ()%>">
+	<form method="post" enctype="multipart/form-data" action="<%=q.getQ()%>" acceptcharset="UTF-8">
 	<input type="hidden" name="upload" value="1"/>
 	<%
 	if ( q.getTextData() != null && request.getParameter("edit") != null ) {
@@ -177,7 +178,7 @@ try
 	
 	<textarea id="text" name="text" cols="40" rows="4" placeholder="type text here"><%
 	if ( q.getTextData() != null && request.getParameter("edit") != null ) {
-		%><%=q.getTextData()%><%
+		%><%=StringEscapeUtils.escapeHtml(q.getTextData())%><%
 	}
 	%></textarea>
 	<br/>

@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<class name="com.nightox.q.model.m.Keyword" table="keywords">
+		<id name="id" column="id">
+			<generator class="increment"/>
+		</id>	
+		<property name="keyword"/>
+	</class>
+	
+	<class name="com.nightox.q.model.m.Q" table="qs">
+		<id name="id" column="id">
+			<generator class="increment"/>
+		</id>	
+		<property name="q"/>
+		<property name="dataType" column="data_type"/>
+		<property name="binaryData" column="binary_data"/>
+		<property name="contentType" column="content_type"/>
+		<property name="textData" column="text_data"/>
+	</class>
+	
+
+	<!-- 
+		generic mappings follow 
+	-->
+
+	<class name="com.nightox.q.model.Account" table="accounts">
+		<id name="id" column="id">
+			<generator class="increment"/>
+		</id>	
+		<property name="displayName" column="display_name"/>
+		<property name="role"/>
+
+	</class>
+	
+	<class name="com.nightox.q.model.User" table="users">
+		<id name="id" column="id">
+			<generator class="increment"/>
+		</id>
+		<property name="displayName" column="display_name"/>
+		<many-to-one name="account" column="account_id" unique="true"/>		
+
+		<property name="role"/>
+
+		<property name="username"/>
+		<property name="password"/>
+		
+		<property name="timeZone" column="time_zone"/>
+
+	</class>
+	
+	<class name="com.nightox.q.model.Job" table="jobs">
+		<id name="id" column="id">
+			<generator class="increment"/>
+		</id>
+		
+		<property name="displayName" column="display_name"/>
+				
+		<property name="kind"/>
+		<property name="status"/>
+		
+		<property name="datetimeCreated" column="datetime_created"/>
+		<property name="datetimePending" column="datetime_pending"/>
+		<property name="datetimeScheduled" column="datetime_scheduled"/>
+		<property name="datetimeStarted" column="datetime_started"/>
+		<property name="datetimeDone" column="datetime_done"/>
+
+		<property name="message"/>
+		<property name="progress"/>
+		<property name="param0"/>
+		<property name="param1"/>
+		<property name="param2"/>
+		<property name="param3"/>
+		
+		<property name="datetimeNextRun" column="datetime_next_run"/>
+		
+	</class>
+
+	<class name="com.nightox.q.model.Refvalue" table="refvalues">
+		<id name="id" column="id">
+			<generator class="increment"/>
+		</id>
+		
+		<property name="type"/>		
+		<property name="displayName" column="display_name"/>		
+		<property name="description"/>		
+		<property name="code"/>		
+	</class>
+
+	<class name="com.nightox.q.model.Relation" table="relations">
+		<id name="id" column="id">
+			<generator class="increment"/>
+		</id>
+		
+		<property name="type"/>		
+		<property name="leftId" column="left_id"/>		
+		<property name="rightId" column="right_id"/>		
+	</class>
+
+	<class name="com.nightox.q.model.Prop" table="props">
+		<id name="id" column="id">
+			<generator class="increment"/>
+		</id>
+		
+		<property name="name"/>		
+		<property name="value"/>		
+		<property name="objectId" column="object_id"/>		
+		<property name="objectClass" column="object_class"/>		
+	</class>
+</hibernate-mapping>

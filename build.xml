@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project>
+<project name="matrix-web" default="war" basedir=".">
+
+	<loadproperties srcfile="WebContent/WEB-INF/classes/beans/factory.properties"/>
+	
+	<property name="version" value="${build.version}"/>
+	<property name="user.name" value="Dror Kessler"/>
+	
+	<property name="appname-nover" value="q"/>
+	<property name="appname" value="${appname-nover}-${version}"/>
+	<property name="basedir" value="."/>
+	<property name="web.dir" value="${basedir}/WebContent"/>
+	
+	<property name="src.dir" value="${basedir}/src"/>
+	<property name="lib.dir" value="${web.dir}/WEB-INF/lib"/>
+	<property name="build.dir" value="${basedir}/build"/>
+	<property name="build.classes.dir" value="${build.dir}/${version}/classes"/>
+
+	<property name="build.latest.dir" value="${build.dir}/latest"/>
+	
+	<property name="manifest" value="${build.dir}/${version}/MANIFEST.MF"/>
+	
+	<property name="tomcat7.lib.dir" value="/Users/drorkessler/Applications/apache-tomcat-7.0.42/lib"/>
+
+	<path id="build.path">
+    	<pathelement location="${build.classes.dir}"/>
+	</path>
+
+	<property name="war" value="${build.dir}/${version}/${appname}.war"/>
+	<property name="war-nolib" value="${build.dir}/${version}/${appname}-nolib.war"/>
+		
+	
+	<target name="war" depends="compile,war-nolib">
+		<mkdir dir="${build.dir}/${version}"/>
+		<manifest file="${manifest}">
+		    <attribute name="Built-By" value="${user.name}"/>
+		    <section name="common">
+		      <attribute name="Specification-Title" value="Q"/>
+		      <attribute name="Specification-Version" value="${version}"/>
+		      <attribute name="Specification-Vendor" value="Nightox"/>
+		      <attribute name="Implementation-Title" value="Q"/>
+		      <attribute name="Implementation-Version" value="${version}"/> 
+		      <attribute name="Implementation-Vendor" value="Nightox"/>
+		    </section>
+	  	</manifest>
+		<war warfile="${war}" index="no" needxmlfile="false">
+			<fileset dir="${web.dir}"/>
+			<zipfileset dir="${build.classes.dir}" prefix="WEB-INF/classes"/>
+		</war>
+		
+		<deltree dir="${build.latest.dir}"/>
+		<mkdir dir="${build.latest.dir}"/>
+		<copy file="${war}" todir="${build.latest.dir}"/>
+		<copy file="${war-nolib}" todir="${build.latest.dir}"/>
+		<copy file="${war}" tofile="${build.latest.dir}/${appname-nover}.war"/>
+	</target>
+
+	<target name="war-nolib" depends="compile">
+		<mkdir dir="${build.dir}/${version}"/>
+		<manifest file="${manifest}">
+		    <attribute name="Built-By" value="${user.name}"/>
+		    <section name="common">
+		      <attribute name="Specification-Title" value="Q"/>
+		      <attribute name="Specification-Version" value="${version}"/>
+		      <attribute name="Specification-Vendor" value="Nightox"/>
+		      <attribute name="Implementation-Title" value="Q"/>
+		      <attribute name="Implementation-Version" value="${version}"/> 
+		      <attribute name="Implementation-Vendor" value="Nightox"/>
+		    </section>
+	  	</manifest>
+		<war warfile="${war-nolib}" index="no" needxmlfile="false">
+			<fileset dir="${web.dir}" excludes="WEB-INF/lib/* yui/**/*"/>
+			<zipfileset dir="${build.classes.dir}" prefix="WEB-INF/classes"/>
+		</war>
+
+		
+	</target>
+
+	<target name="compile">
+		<mkdir dir="${build.classes.dir}"/>
+
+		<javac srcdir="${src.dir}" destdir="${build.classes.dir}" debug="true" includeantruntime="false">
+			<classpath>
+				<fileset dir="${lib.dir}">						
+					<include name="*.jar"/>
+				</fileset>
+			</classpath>
+			<classpath>
+				<fileset dir="${tomcat7.lib.dir}">						
+					<include name="*.jar"/>
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+	
+</project>

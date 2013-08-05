@@ -1,0 +1,21 @@
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+	<bean id="Cmd_Model" class="com.nightox.q.beans.Environment$ApiCommandsMap">
+		
+		<property name="apiCommands">
+			<map>
+
+				<entry key="/keyword/">
+					<bean parent="CmdBaseSuper" class="com.nightox.q.api.cmd.base.CmdCRUDBase">
+						<property name="crudClass" value="com.nightox.q.model.m.Keyword"/>
+						<property name="createFieldsText" value="keyword"/>
+					</bean>
+				</entry>
+
+			</map>
+		</property>
+			
+	</bean>
+
+</beans>

@@ -1,0 +1,207 @@
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+	<import resource="cmd_generic.xml"/>
+	<import resource="cmd_model.xml"/>
+
+	<bean id="DefaultEnvironment" class="com.nightox.q.beans.Environment">		
+	
+		<property name="apiDateFormatString" value="yyyyMMdd'T'HHmmssZ"/>
+		<property name="tmpFolder" value="${folder.tmp}"/>
+		<property name="shellCommandPrefix" value="${sh.prefix}"/>
+		
+		<property name="apiCommandsList">
+			<list>
+				<ref bean="Cmd_Generic"/>
+				<ref bean="Cmd_Model"/>
+			</list>
+		</property>
+			
+		<property name="apiSessionManager">
+			<bean class="com.nightox.q.api.ApiSessionManager">
+				<property name="staleSessionInterval" value="120"/>	<!-- 120 seconds, since not using session really -->
+			</bean>
+		</property>
+
+		<property name="timerManager">
+			<bean class="com.nightox.q.timer.TimerManager">
+				<property name="enabled" value="${timer.enabled}"/>
+				<property name="initTimers">
+					<list>
+						<bean class="com.nightox.q.timer.TimerSpec">
+							<property name="clazz" value="com.nightox.q.api.ApiSessionGCJob"/>
+						</bean>
+						<bean class="com.nightox.q.timer.TimerSpec">
+							<property name="clazz" value="com.nightox.q.jobs.SchedulerJob"/>
+							<property name="timeout" value="3"/>							
+						</bean>
+					</list>
+				</property>
+			</bean>
+		</property>
+		
+		<property name="schedulerJob">
+			<bean class="com.nightox.q.jobs.SchedulerJob">
+				<property name="jobRunners">
+					<map>
+						<entry key="sleeptest">
+							<bean class="com.nightox.q.jobs.IterativeSleepTestJobRunner">
+								<property name="iterations" value="10"/>
+							</bean>
+						</entry>
+						<entry key="api">
+							<bean class="com.nightox.q.jobs.ApiJobRunner">
+							</bean>
+						</entry>
+					</map>
+				</property>
+			</bean>
+		</property>
+		
+		<property name="databaseInitData">
+			<list>
+			</list>
+		</property>
+		
+		<property name="initRunnables">
+			<list>
+				<bean class="com.nightox.q.jobs.JobsInitializer"/>
+				<bean class="com.nightox.q.inits.StartStopServicesInits">
+					<property name="services">
+						<list/>
+					</property>
+				</bean>
+				<bean class="com.nightox.q.inits.StopDeamonsInits">
+					<property name="deamons">
+						<list/>
+					</property>
+				</bean> 	
+				<bean class="com.nightox.q.inits.ExecuteApiInits">
+					<property name="cmds">
+						<list/>
+					</property>
+				</bean>
+			</list>
+		</property>
+		
+		<property name="services">
+			<bean class="com.nightox.q.beans.Services">
+				<property name="qTypeManager">
+					<bean class="com.nightox.q.types.QTypeManager">
+						<property name="typesList">
+							<list>
+								<bean class="com.nightox.q.types.spec.QNoteType">
+									<property name="displayName" value="Text Note"/>
+									<property name="dataType" value="text"/>
+									<property name="uploadFields">
+										<list>
+											<bean class="com.nightox.q.types.QTypeField">
+												<property name="name" value="title"/>
+												<property name="label" value="Title"/>
+											</bean>
+											<bean class="com.nightox.q.types.QTypeField">
+												<property name="name" value="note"/>
+												<property name="label" value="Note"/>
+												<property name="type" value="textarea"/>
+											</bean>
+										</list>
+									</property>
+								</bean>
+								<bean class="com.nightox.q.types.spec.QImageType">
+									<property name="displayName" value="Upload Image"/>
+									<property name="dataType" value="image"/>
+									<property name="uploadFields">
+										<list>
+											<bean class="com.nightox.q.types.QTypeField">
+												<property name="name" value="title"/>
+												<property name="label" value="Title"/>
+											</bean>
+											<bean class="com.nightox.q.types.QTypeField">
+												<property name="name" value="file"/>
+												<property name="label" value="Image"/>
+												<property name="type" value="file"/>
+											</bean>
+										</list>
+									</property>
+								</bean>
+								<bean parent="QListTypeBase">
+									<property name="displayName" value="Youtube/Vimeo/Soundcloud"/>
+									<property name="dataType" value="link"/>
+								</bean>
+							</list>
+						</property>
+					</bean>
+				</property>
+			</bean>
+		</property>
+		
+	</bean>
+
+	<bean id="CmdBaseGuest" class="com.nightox.q.api.cmd.base.CmdBase">
+		<property name="minUserRole" value="guest"/>
+	</bean>
+	<bean id="CmdBaseUser" class="com.nightox.q.api.cmd.base.CmdBase">
+		<property name="minUserRole" value="user"/>
+	</bean>
+	<bean id="CmdBaseAdmin" class="com.nightox.q.api.cmd.base.CmdBase">
+		<property name="minUserRole" value="admin"/>
+	</bean>
+	<bean id="CmdBaseSuper" class="com.nightox.q.api.cmd.base.CmdBase">
+		<property name="minUserRole" value="super"/>
+	</bean>
+
+	<bean id="QListTypeBase" class="com.nightox.q.types.spec.QLinkType">
+		<property name="uploadFields">
+			<list>
+				<bean class="com.nightox.q.types.QTypeField">
+					<property name="name" value="link"/>
+					<property name="label" value="Link"/>
+				</bean>
+			</list>
+		</property>
+		
+		<property name="specs">
+			<list>
+				<!-- youtube -->
+				<bean class="com.nightox.q.types.spec.QLinkTypeSpec">
+					<property name="pattern" value="^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&amp;\?]*).*"/>
+					<property name="html">
+						<value>
+						<![CDATA[
+							<iframe width="560" height="315" src="//www.youtube.com/embed/$7" frameborder="0" allowfullscreen></iframe>
+						]]>
+						</value>
+					</property>
+				</bean>
+
+				<!-- vimeo -->
+				<bean class="com.nightox.q.types.spec.QLinkTypeSpec">
+					<property name="pattern" value="([http|https]+:\/\/(?:www\.)?vimeo\.com\/(\d+)\w*)"/>
+					<property name="html">
+						<value>
+						<![CDATA[
+							<iframe src="http://player.vimeo.com/video/$2" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+						]]>
+						</value>
+					</property>
+				</bean>
+				
+				<!-- soundcloud -->
+				<bean class="com.nightox.q.types.spec.QLinkTypeSpec">
+					<property name="pattern" value="(https?:\/\/(?:www.)?soundcloud.com\/[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*(?!\/sets(?:\/|$))(?:\/[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*){1,2}\/?)"/>
+					<property name="find" value="true"/>
+					<property name="urlEncode" value="true"/>
+					<property name="html">
+						<value>
+						<![CDATA[
+							<iframe width="100%" height="166" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=$1&color=ff6600&amp;auto_play=false&amp;show_artwork=false"></iframe>
+						]]>
+						</value>
+					</property>
+				</bean>
+
+			</list>
+		</property>
+	</bean>
+	
+</beans>

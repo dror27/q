@@ -1,0 +1,117 @@
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+	<bean id="Cmd_Generic" class="com.nightox.q.beans.Environment$ApiCommandsMap">
+			
+		<property name="apiCommands">
+			<map>
+				<entry key="/nop">
+					<bean parent="CmdBaseGuest" class="com.nightox.q.api.cmd.CmdNop"/>
+				</entry>
+				
+				<entry key="/info">
+					<bean parent="CmdBaseSuper" class="com.nightox.q.api.cmd.CmdInfo">
+						<property name="apiInfo">
+							<map>
+								<entry key="version" value="${build.version}"/>
+							</map>
+						</property>
+					</bean>
+				</entry>
+				
+				<entry key="/login">
+					<bean parent="CmdBaseGuest" class="com.nightox.q.api.cmd.CmdLogin"/>
+				</entry>
+				
+				<entry key="/logout">
+					<bean parent="CmdBaseUser" class="com.nightox.q.api.cmd.CmdLogout"/>
+				</entry>
+				
+				<entry key="/user/">
+					<bean parent="CmdBaseUser" class="com.nightox.q.api.cmd.base.CmdCRUDBase">
+						<property name="crudClass" value="com.nightox.q.model.User"/>
+						<property name="createFields">
+							<list>
+								<value>displayName::</value>
+								<value>role::</value>
+								<value>account::</value>
+								<value>username::</value>
+								<value>password::</value>
+								<value>timeZone::</value>
+							</list>
+						</property>
+						<property name="createMinRole" value="super"/>
+					</bean>
+				</entry>
+
+				<entry key="/job/">
+					<bean parent="CmdBaseSuper" class="com.nightox.q.api.cmd.base.CmdCRUDBase">
+						<property name="crudClass" value="com.nightox.q.model.Job"/>
+						<property name="createFields">
+							<list>
+								<value>displayName</value>
+								<value>kind</value>
+								<value>status::</value>
+								<value>param0::</value>
+								<value>param1::</value>
+								<value>param2::</value>
+								<value>param3::</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+				
+				<entry key="/refvalue/">
+					<bean parent="CmdBaseSuper" class="com.nightox.q.api.cmd.base.CmdCRUDBase">
+						<property name="crudClass" value="com.nightox.q.model.Refvalue"/>
+						<property name="createFields">
+							<list>
+								<value>type</value>
+								<value>displayName</value>
+								<value>code</value>
+								<value>description::</value>
+							</list>
+						</property>
+						<property name="globalCommands">
+							<map>
+								<entry key="import">
+									<bean class="com.nightox.q.api.cmd.CmdRefvalueImport"/>
+								</entry>
+							</map>
+						</property>
+					</bean>
+				</entry>
+
+				<entry key="/relation/">
+					<bean parent="CmdBaseSuper" class="com.nightox.q.api.cmd.base.CmdCRUDBase">
+						<property name="crudClass" value="com.nightox.q.model.Relation"/>
+						<property name="createFields">
+							<list>
+								<value>type</value>
+								<value>leftId</value>
+								<value>rightId</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+
+				<entry key="/prop/">
+					<bean parent="CmdBaseSuper" class="com.nightox.q.api.cmd.base.CmdCRUDBase">
+						<property name="crudClass" value="com.nightox.q.model.Prop"/>
+						<property name="createFields">
+							<list>
+								<value>name</value>
+								<value>value::</value>
+								<value>objectId::</value>
+								<value>objectClass::</value>
+							</list>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+			
+	</bean>
+
+	
+</beans>

@@ -1,0 +1,31 @@
+[x] unify all links (youtube, soundcloud, etc) into one?
+[x] mobile site css
+
+[ ] js field validation segments on upload
+[ ] add text field "empty" string prompt
+[ ] "facebook style" status instead of typed entry
+[ ] hebrew characters check on post
+
+
+[ ] debug upload a picture from phone
+[ ] picture upload progress
+
+[ ] add agreement to terms checkbox to upload
+
+[ ] add post upload page for setting protection period (free=4 hours, email=24 hours, pay=more)
+[ ] add location acquisition code
+[ ] add access log file (w/ cookie, location, etc)
+
+[ ] allow posting user to change before period is over
+
+[ ] make period suitable for daily or hourly maintenance (24+slack, etc)
+
+[ ] make fonts ok for phone
+[ ] move to other server
+
+[ ] lease management
+
+
+[ ] design fav icon
+ 
+[ ] design custom image for qrcode center

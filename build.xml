@@ -21,7 +21,7 @@
 	
 	<property name="manifest" value="${build.dir}/${version}/MANIFEST.MF"/>
 	
-	<property name="tomcat7.lib.dir" value="/Users/drorkessler/Applications/apache-tomcat-7.0.42/lib"/>
+	<property name="tomcat7.lib.dir" value="./tomcat7-lib"/>
 
 	<path id="build.path">
     	<pathelement location="${build.classes.dir}"/>

@@ -76,5 +76,13 @@ public class HtmlRenderer {
 		this.specs = specs;
 	}
 
+	public ImgRenderer getImgRenderer() {
+		return imgRenderer;
+	}
+
+	public void setImgRenderer(ImgRenderer imgRenderer) {
+		this.imgRenderer = imgRenderer;
+	}
+
 
 }

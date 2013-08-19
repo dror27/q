@@ -1,4 +1,4 @@
-<%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringEscapeUtils"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
+<%@page import="java.text.DecimalFormat"%><%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringEscapeUtils"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
 
 final Log			log = LogFactory.getLog(this.getClass());
 
@@ -220,10 +220,10 @@ try
 <% if ( q.getDataType() == null || request.getParameter("replace") != null || request.getParameter("edit") != null ) { %>
 	<div class="ctrl">
 		<% if ( request.getParameter("replace") != null || request.getParameter("edit") != null ) { %>
-		<a href="<%=q.getQ()%>"><img src="<%=cdnUrl%>img/icons/glyphish/113-navigation-mirror.png"/></a>
+		<a title="back" href="<%=q.getQ()%>"><img src="<%=cdnUrl%>img/icons/glyphish/113-navigation-mirror.png"/></a>
 		<% } %>
-		<a href="javascript:toggle_file()"><img id="file_enable" src="<%=cdnUrl%>img/icons/glyphish/68-paperclip.png"/></a>
-		<a href="<%=rootPath%>" target="_blank" style="float:right"><img src="<%=cdnUrl%>img/icons/glyphish/10-medical.png"/></a>
+		<a title="attach" href="javascript:toggle_file()"><img id="file_enable" src="<%=cdnUrl%>img/icons/glyphish/68-paperclip.png"/></a>
+		<a title="print" href="<%=rootPath%>" target="_blank" style="float:right"><img src="<%=cdnUrl%>img/icons/glyphish/10-medical.png"/></a>
 	</div>
 
 	<div class="data">
@@ -250,13 +250,28 @@ try
 	</div>
 <% } else { %>
 	<div class="ctrl">
-		<a href="<%=q.getQ()%>?replace"><img src="<%=cdnUrl%>img/icons/glyphish/08-chat.png"/></a>	
-		<a href="<%=q.getQ()%>?edit"><img src="<%=cdnUrl%>img/icons/glyphish/19-gear.png"/></a>
-		<a href="<%=q.getQ()%>?clear"><img src="<%=cdnUrl%>img/icons/glyphish/22-skull-n-bones.png"/></a>	
+		<% if ( request.getParameter("source") != null ) { %>
+		<a title="back" href="<%=q.getQ()%>"><img src="<%=cdnUrl%>img/icons/glyphish/113-navigation-mirror.png"/></a>
+		<% } else { %>
+		<a title="replace" href="<%=q.getQ()%>?replace"><img src="<%=cdnUrl%>img/icons/glyphish/08-chat.png"/></a>	
+		<a title="edit" href="<%=q.getQ()%>?edit"><img src="<%=cdnUrl%>img/icons/glyphish/19-gear.png"/></a>
+		<a title="clear" href="<%=q.getQ()%>?clear"><img src="<%=cdnUrl%>img/icons/glyphish/22-skull-n-bones.png"/></a>	
+		<a title="source" href="<%=q.getQ()%>?source"><img src="<%=cdnUrl%>img/icons/glyphish/12-eye.png"/></a>
+		<% } %> 
 		<a href="<%=rootPath%>" target="_blank" style="float:right"><img src="<%=cdnUrl%>img/icons/glyphish/10-medical.png"/></a>
 	</div>
 	<div class="data">
-		<%=Factory.getServices().getHtmlRenderer().renderHtml(q)%>
+		<% if ( request.getParameter("source") != null ) { 
+			if ( Factory.getServices().getHtmlRenderer().getImgRenderer().isImageQ(q) )
+			{
+				DecimalFormat		format = new DecimalFormat();
+				%><pre>[Image: <%=q.getContentType()%>, <%=format.format(q.getBinaryData().length)%> bytes]</pre><%	
+			}
+			%><pre><%=q.getTextData()%></pre><%
+			
+		} else {
+			%><%=Factory.getServices().getHtmlRenderer().renderHtml(q)%><%
+		} %>
 	</div>
 <% } %>
 

@@ -53,6 +53,8 @@
 [ ] make period suitable for daily or hourly maintenance (24+slack, etc)
 [ ] lease management
 [ ] manager versions (prev) of content on page
+[ ] AdWords
+[ ] Paypal/lease
 
 --- management ---
 [ ] write management page (basic)

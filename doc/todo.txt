@@ -9,16 +9,18 @@
 [x] hebrew & special (&, etc) characters check on post & edit
 
 [x] separate githib for programming or page examples and documentation (qpub)
+[x] adjust content and embed size to actual width of screen
 
 
 -- html/design --
-[ ] adjust content and embed size to actual width of screen
+[ ] handle device rotation
 [ ] optimize display of short messages (centered, large fonts)
 [ ] make fonts ok for phone
 [ ] design fav icon
 [ ] design custom image for qrcode center
+
 [ ] allow javascript code to format page (client or server side?)
-[ ] provide q specific storage on server
+[ ] provide q specific storage on server (props, attrs, etc)
 [ ] provide standard vars/data to q code (qs around, count of visits, etc, time to end of lease)
 [ ] swipe left/right for prec/next page content
 
@@ -45,6 +47,7 @@
 [ ] allow posting user to change before period is over
 [ ] make period suitable for daily or hourly maintenance (24+slack, etc)
 [ ] lease management
+[ ] manager versions (prev) of content on page
 
 -- non functional --
 [ ] add access log file (w/ cookie, location, etc)

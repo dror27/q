@@ -57,3 +57,5 @@
 [ ] use maven?
 [ ] remove dependency on freebss
 
+--- investigate ---
+[ ] why are resources sometimes returning with 304 after an update on the server? 

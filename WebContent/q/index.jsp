@@ -70,6 +70,20 @@ try
 		return;
 	}
 	
+	// reporting position?
+	if ( request.getParameter("position") != null )
+	{
+		// save
+		if ( request.getParameter("latitude") != null )
+			q.setLatitude(Double.parseDouble(request.getParameter("latitude")));
+		if ( request.getParameter("longitude") != null )
+			q.setLongitude(Double.parseDouble(request.getParameter("longitude")));
+		if ( request.getParameter("altitude") != null )
+			q.setAltitude(Double.parseDouble(request.getParameter("altitude")));
+		
+		// set empty response back
+		return;
+	}			
 	
 	// uploading?
 	if ( ServletFileUpload.isMultipartContent(request) )
@@ -238,6 +252,8 @@ try
 			  $(".video_iframe").each(function(index, iframe) {
 				adjust_video_iframe(iframe);
 			  });
+			  
+			  get_position();
 			});
 			
 		function toggle_file()
@@ -259,6 +275,50 @@ try
 			
 			iframe.height = scrollHeight;
 		}
+		
+		function get_position()
+		{
+			if ( navigator.geolocation ) 
+			{
+				var timeoutVal = 10 * 1000 * 1000;
+				
+				navigator.geolocation.getCurrentPosition(
+				    get_position_success, 
+				    get_position_error,
+				    { enableHighAccuracy: true, timeout: timeoutVal, maximumAge: 0 }
+				  );
+			}
+			else
+			{
+				//alert("Geolocation is not supported by this browser");
+			}
+		}
+		
+		function get_position_success(position)
+		{
+			//alert("Latitude: " + position.coords.latitude + ", Longitude: " + position.coords.longitude);
+			
+			var		url = "<%=q.getQ()%>?position";
+			var		data = new Object();
+			data.latitude = position.coords.latitude;
+			data.longitude = position.coords.longitude;
+			if ( position.coords.altitude != null )
+				data.altitude = position.coords.altitude;
+			
+			$.post(url, data);			
+		}
+		
+		function get_position_error(error)
+		{
+			 var errors = { 
+					    1: 'Permission denied',
+					    2: 'Position unavailable',
+					    3: 'Request timeout'
+					  };
+			 
+			//alert("Error: " + errors[error.code]);
+		}
+		
 		</script>
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->

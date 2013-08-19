@@ -30,6 +30,10 @@ CREATE TABLE `qs` (
   `binary_data` MEDIUMBLOB,
   `content_type` char(64),
   
+  `latitude` double,
+  `longitude` double,
+  `altitude` double,
+  
   PRIMARY KEY  (`id`)
   
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

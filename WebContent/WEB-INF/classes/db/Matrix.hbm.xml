@@ -18,6 +18,10 @@
 		<property name="binaryData" column="binary_data"/>
 		<property name="contentType" column="content_type"/>
 		<property name="textData" column="text_data"/>
+		
+		<property name="latitude"/>
+		<property name="longitude"/>
+		<property name="altitude"/>
 	</class>
 	
 

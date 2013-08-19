@@ -24,6 +24,6 @@ public class ImgRenderer {
 	
 	public String renderHtml(Q q)
 	{
-		return String.format("<img src=\"%s?image\"/>", q.getQ());
+		return String.format("<div class=\"data_img\"><img x-width=\"0\" width=\"100%%\" src=\"%s?image\"/></div>", q.getQ());
 	}
 }

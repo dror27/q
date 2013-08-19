@@ -8,12 +8,28 @@
 [x] add text field "empty" string prompt (placeholder)
 [x] hebrew & special (&, etc) characters check on post & edit
 
+[x] separate githib for programming or page examples and documentation (qpub)
+
+
 -- html/design --
 [ ] adjust content and embed size to actual width of screen
 [ ] optimize display of short messages (centered, large fonts)
 [ ] make fonts ok for phone
 [ ] design fav icon
 [ ] design custom image for qrcode center
+[ ] allow javascript code to format page (client or server side?)
+[ ] provide q specific storage on server
+[ ] provide standard vars/data to q code (qs around, count of visits, etc, time to end of lease)
+[ ] swipe left/right for prec/next page content
+
+-- api ---
+[ ] simpe api based on the stndard jsp/servlet
+[ ] param for output format (html/json)
+[ ] param for getting depth
+[ ] param for getting deep (prev) page
+
+--- test ---
+[ ] add standard content pages that get created automatically, containing samples of different cases
 
 -- usability --
 [ ] js field validation segments on upload
@@ -21,6 +37,7 @@
 
 -- legal -- 
 [ ] add agreement to terms checkbox to upload
+[ ] add copyright notice for all thirdparty used files
 
 -- business logic --
 [ ] add post upload page for setting protection period (free=4 hours, email=24 hours, pay=more)
@@ -34,4 +51,6 @@
 
 -- deploy --
 [ ] move to other server
+[ ] use maven?
+[ ] remove dependency on freebss
 

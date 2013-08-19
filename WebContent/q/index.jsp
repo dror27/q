@@ -154,20 +154,47 @@ try
         <link rel="stylesheet" href="<%=rootPath%>css/normalize.css">
         <link rel="stylesheet" href="<%=rootPath%>css/main.css">
         <script src="<%=rootPath%>js/vendor/modernizr-2.6.2.min.js"></script>
+        
+        <style type="text/css">
+        body {
+        	background: #99CCFF;
+        }
+        div.ctrl {
+        	background: #8AB8E6;
+        	padding-top: 5px;
+        	padding-bottom: 5px;
+        }
+        div.button_div {
+        	padding-top: 5px;
+        	padding-bottom: 5px;
+        }
+        div.ctrl a {
+        	font-size: 20pt;
+        	padding-left: 5px;
+        	padding-right: 5px;
+        	text-decoration: none !important;
+        }
+        div.data {
+        	margin: 5px;
+        }
+        div.data_img {
+        	padding-bottom:5px;
+        }
+        </style>
     </head>
     <body>
 
     <!-- Add your site or application content here -->
 <% if ( q.getDataType() == null || request.getParameter("replace") != null || request.getParameter("edit") != null ) { %>
-	<div>
+	<div class="ctrl">
 		<% if ( request.getParameter("replace") != null || request.getParameter("edit") != null ) { %>
-		<a href="<%=q.getQ()%>">cancel</a> |
+		<a href="<%=q.getQ()%>"><img src="../img/icons/glyphish/113-navigation-mirror.png"/></a>
 		<% } %>
-		<a href="<%=rootPath%>" target="_blank">create more</a> (<a href="<%=rootPath%>?rows=2&cols=1" target="_blank">big</a>,<a href="<%=rootPath%>?rows=1&cols=1" target="_blank">huge</a>)
+		<a href="javascript:toggle_file()"><img id="file_enable" src="../img/icons/glyphish/68-paperclip.png"/></a>
+		<a href="<%=rootPath%>" target="_blank" style="float:right"><img src="../img/icons/glyphish/10-medical.png"/></a>
 	</div>
 
-	<div>
-	<h2><%=Factory.getConfProperty("html.fillMe") %></h2>
+	<div class="data">
 	<form method="post" enctype="multipart/form-data" action="<%=q.getQ()%>" acceptcharset="UTF-8">
 	<input type="hidden" name="upload" value="1"/>
 	<%
@@ -176,25 +203,27 @@ try
 	}
 	%>
 	
-	<textarea id="text" name="text" cols="40" rows="4" placeholder="type text here"><%
+	<div class="button_div" id="file_div" style="display:none">
+		<input id="file" name="file" type="file" placeholder="upload image here">
+	</div>
+	<textarea id="text" name="text" cols="33" rows="6" placeholder="type text here"><%
 	if ( q.getTextData() != null && request.getParameter("edit") != null ) {
 		%><%=StringEscapeUtils.escapeHtml(q.getTextData())%><%
 	}
 	%></textarea>
-	<br/>
-	Image: <input id="file" name="file" type="file" placeholder="upload image here">
-	<br/>
-	<input type="submit" name="post" value="Post"/>
+	<div class="button_div">
+		<input type="submit" name="post" value="Post"/>
+	</div>
 	</form>
 	</div>
 <% } else { %>
-	<div>
-		<a href="<%=q.getQ()%>?replace">replace</a> |	
-		<a href="<%=q.getQ()%>?edit">edit</a> |	
-		<a href="<%=q.getQ()%>?clear">clear</a> |	
-		<a href="<%=rootPath%>" target="_blank">create more</a> (<a href="<%=rootPath%>?rows=2&cols=1" target="_blank">big</a>,<a href="<%=rootPath%>?rows=1&cols=1" target="_blank">huge</a>)
+	<div class="ctrl">
+		<a href="<%=q.getQ()%>?replace"><img src="../img/icons/glyphish/08-chat.png"/></a>	
+		<a href="<%=q.getQ()%>?edit"><img src="../img/icons/glyphish/19-gear.png"/></a>
+		<a href="<%=q.getQ()%>?clear"><img src="../img/icons/glyphish/22-skull-n-bones.png"/></a>	
+		<a href="<%=rootPath%>" target="_blank" style="float:right"><img src="../img/icons/glyphish/10-medical.png"/></a>
 	</div>
-	<div>
+	<div class="data">
 		<%=Factory.getServices().getHtmlRenderer().renderHtml(q)%>
 	</div>
 <% } %>
@@ -206,8 +235,30 @@ try
 
 		<script>
 		Zepto(function($){
-			  // init code goes here
-			})
+			  $(".video_iframe").each(function(index, iframe) {
+				adjust_video_iframe(iframe);
+			  });
+			});
+			
+		function toggle_file()
+		{
+			var		file = $('#file_div')[0];
+			var		display = file.style.display;
+			
+			if ( display == 'none' )
+				file.style.display = "";
+			else
+				file.style.display = "none";
+		}
+		
+		function adjust_video_iframe(iframe)
+		{
+			var		width = iframe.contentWindow.document.body.scrollWidth;
+			var		height = width * 9 / 16;
+			var		scrollHeight = (Math.floor(height)) + "px";
+			
+			iframe.height = scrollHeight;
+		}
 		</script>
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->

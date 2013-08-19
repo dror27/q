@@ -23,7 +23,7 @@ public class HtmlRenderer {
 		if ( imgRenderer.isImageQ(q) )
 		{
 			sb.append(imgRenderer.renderHtml(q));
-			sb.append("\n<br/>\n");
+			sb.append("\n");
 		}
 		
 		// has text?
@@ -42,12 +42,12 @@ public class HtmlRenderer {
 			text = text.replace("<a ", "<a target=\"_blank\" ");
 			
 			// process done, emit
-			sb.append(text);
 			for ( String embed : embeds )
 			{
-				sb.append("\n<br/>\n");
 				sb.append(embed);
+				sb.append("\n<br/>\n");
 			}
+			sb.append(text);
 		}
 		
 		

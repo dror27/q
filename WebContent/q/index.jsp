@@ -91,54 +91,59 @@ try
 	// uploading?
 	if ( ServletFileUpload.isMultipartContent(request) )
 	{
-		// starting upload
-		log.info("starting upload");
-		
-		// Create a factory for disk-based file items
-		DiskFileItemFactory factory = new DiskFileItemFactory();
-		factory.setSizeThreshold(16 * 1024 * 1024);
-		log.info("disk-based factory created");
-
-		// Configure a repository (to ensure a secure temp location is used)
-		ServletContext servletContext = this.getServletConfig().getServletContext();
-		File repository = (File) servletContext.getAttribute("javax.servlet.context.tempdir");
-		factory.setRepository(repository);
-		log.info("repository created");
-
-		// Create a new file upload handler
-		ServletFileUpload upload = new ServletFileUpload(factory);
-		log.info("upload handler created");
-
-		// Parse the request
-		Map<String, FileItem>	items = new LinkedHashMap<String, FileItem>();
-		for ( FileItem item : upload.parseRequest(request) )
+		try
 		{
-			log.info("item: " + item.getFieldName());
-			items.put(item.getFieldName(), item);
-		}
-		
-		// must have upload field
-		if ( items.containsKey("upload") )
-		{
-			// process
-			if ( !items.containsKey("edit") )
-				q.cleanData();
-			q.setDataType("post");
-			q.setTextData(items.get("text").getString("UTF-8"));
-			if ( items.containsKey("file") 
-						&& !StringUtils.isEmpty(items.get("file").getContentType()) 
-						&& items.get("file").getSize() > 0 )
+			// starting upload
+			log.info("starting upload");
+			
+			// Create a factory for disk-based file items
+			DiskFileItemFactory factory = new DiskFileItemFactory();
+			factory.setSizeThreshold(16 * 1024 * 1024);
+			log.info("disk-based factory created");
+	
+			// Configure a repository (to ensure a secure temp location is used)
+			ServletContext servletContext = this.getServletConfig().getServletContext();
+			File repository = (File) servletContext.getAttribute("javax.servlet.context.tempdir");
+			factory.setRepository(repository);
+			log.info("repository created");
+	
+			// Create a new file upload handler
+			ServletFileUpload upload = new ServletFileUpload(factory);
+			log.info("upload handler created");
+	
+			// Parse the request
+			Map<String, FileItem>	items = new LinkedHashMap<String, FileItem>();
+			for ( FileItem item : upload.parseRequest(request) )
 			{
-				q.setBinaryData(items.get("file").getInputStream());
-				q.setContentType(items.get("file").getContentType());
+				log.info("item: " + item.getFieldName());
+				items.put(item.getFieldName(), item);
 			}
 			
-			
-			// redirect to view page
-			log.info("redirecting");
-			response.sendRedirect(q.getQ());
-			return;
+			// must have upload field
+			if ( items.containsKey("upload") )
+			{
+				// process
+				if ( !items.containsKey("edit") )
+					q.cleanData();
+				q.setDataType("post");
+				q.setTextData(items.get("text").getString("UTF-8"));
+				if ( items.containsKey("file") 
+							&& !StringUtils.isEmpty(items.get("file").getContentType()) 
+							&& items.get("file").getSize() > 0 )
+				{
+					q.setBinaryData(items.get("file").getInputStream());
+					q.setContentType(items.get("file").getContentType());
+				}
+				
+				
+				// redirect to view page
+				log.info("redirecting");
+			}
+		} catch (Throwable e) {
+			log.error("upload failed", e);
 		}
+		response.sendRedirect(q.getQ());
+		return;
 	}
 	
 	

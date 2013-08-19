@@ -11,6 +11,8 @@
 [x] separate githib for programming or page examples and documentation (qpub)
 [x] adjust content and embed size to actual width of screen
 
+[x] add location acquisition code
+
 
 -- html/design --
 [ ] handle device rotation
@@ -43,7 +45,6 @@
 
 -- business logic --
 [ ] add post upload page for setting protection period (free=4 hours, email=24 hours, pay=more)
-[ ] add location acquisition code
 [ ] allow posting user to change before period is over
 [ ] make period suitable for daily or hourly maintenance (24+slack, etc)
 [ ] lease management

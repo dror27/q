@@ -14,6 +14,7 @@
 
 [x] move statics to cdn
 
+[x] debug upload a picture from phone (apache 10 second upload timeout)
 
 
 -- html/design --
@@ -22,6 +23,7 @@
 [ ] make fonts ok for phone
 [ ] design fav icon
 [ ] design custom image for qrcode center
+[ ] move video auto resize code to iframe onload instead of total page
 
 [ ] allow javascript code to format page (client or server side?)
 [ ] provide q specific storage on server (props, attrs, etc)
@@ -29,7 +31,7 @@
 [ ] swipe left/right for prec/next page content
 
 -- api ---
-[ ] simpe api based on the stndard jsp/servlet
+[ ] simple api based on the stndard jsp/servlet
 [ ] param for output format (html/json)
 [ ] param for getting depth
 [ ] param for getting deep (prev) page
@@ -71,4 +73,3 @@
 --- investigate ---
 [ ] why are resources sometimes returning with 304 after an update on the server? 
 [ ] load test server. problem with concurrent access?
-[ ] debug upload a picture from phone

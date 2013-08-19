@@ -98,7 +98,7 @@ try
 			
 			// Create a factory for disk-based file items
 			DiskFileItemFactory factory = new DiskFileItemFactory();
-			factory.setSizeThreshold(16 * 1024 * 1024);
+			factory.setSizeThreshold(16777216);
 			log.info("disk-based factory created");
 	
 			// Configure a repository (to ensure a secure temp location is used)

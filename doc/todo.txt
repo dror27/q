@@ -4,7 +4,6 @@
 [x] unify all links (youtube, soundcloud, etc) into one?
 [x] mobile site css
 [x] "facebook style" status instead of typed entry
-[x] debug upload a picture from phone
 [x] add text field "empty" string prompt (placeholder)
 [x] hebrew & special (&, etc) characters check on post & edit
 
@@ -12,6 +11,9 @@
 [x] adjust content and embed size to actual width of screen
 
 [x] add location acquisition code
+
+[x] move statics to cdn
+
 
 
 -- html/design --
@@ -64,9 +66,9 @@
 [ ] move to other server
 [ ] use maven?
 [ ] remove dependency on freebss
-[ ] move statics to cdn
 
 
 --- investigate ---
 [ ] why are resources sometimes returning with 304 after an update on the server? 
 [ ] load test server. problem with concurrent access?
+[ ] debug upload a picture from phone

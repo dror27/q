@@ -50,6 +50,13 @@
 [ ] lease management
 [ ] manager versions (prev) of content on page
 
+--- management ---
+[ ] write management page (basic)
+[ ] add map to management page
+
+--- mobile integ ---
+[ ] add send target (send to ...) how?
+
 -- non functional --
 [ ] add access log file (w/ cookie, location, etc)
 
@@ -57,6 +64,9 @@
 [ ] move to other server
 [ ] use maven?
 [ ] remove dependency on freebss
+[ ] move statics to cdn
+
 
 --- investigate ---
 [ ] why are resources sometimes returning with 304 after an update on the server? 
+[ ] load test server. problem with concurrent access?

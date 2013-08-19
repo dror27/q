@@ -3,6 +3,7 @@
 // some constants
 final String		COOKIE_NAME = "Q_694601798f5a490e9a231f2805215e6b";
 final String		rootPath = Factory.getConfProperty("html.rootPath");
+final String		cdnUrl = Factory.getConfProperty("html.cdnUrl");
 
 // first thing first ... we must have a cookie 
 String		cookie = null;
@@ -142,14 +143,14 @@ try
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta http-equiv="cleartype" content="on">
 
-        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="<%=rootPath%>img/touch/apple-touch-icon-144x144-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="<%=rootPath%>img/touch/apple-touch-icon-114x114-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="<%=rootPath%>img/touch/apple-touch-icon-72x72-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" href="<%=rootPath%>img/touch/apple-touch-icon-57x57-precomposed.png">
-        <link rel="shortcut icon" href="<%=rootPath%>img/touch/apple-touch-icon.png">
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="<%=cdnUrl%>img/touch/apple-touch-icon-144x144-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="<%=cdnUrl%>img/touch/apple-touch-icon-114x114-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="<%=cdnUrl%>img/touch/apple-touch-icon-72x72-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" href="<%=cdnUrl%>img/touch/apple-touch-icon-57x57-precomposed.png">
+        <link rel="shortcut icon" href="<%=cdnUrl%>img/touch/apple-touch-icon.png">
 
         <!-- Tile icon for Win8 (144x144 + tile color) -->
-        <meta name="msapplication-TileImage" content="<%=rootPath%>img/touch/apple-touch-icon-144x144-precomposed.png">
+        <meta name="msapplication-TileImage" content="<%=cdnUrl%>img/touch/apple-touch-icon-144x144-precomposed.png">
         <meta name="msapplication-TileColor" content="#222222">
 
 
@@ -165,9 +166,9 @@ try
         <script>(function(a,b,c){if(c in b&&b[c]){var d,e=a.location,f=/^(a|html)$/i;a.addEventListener("click",function(a){d=a.target;while(!f.test(d.nodeName))d=d.parentNode;"href"in d&&(d.href.indexOf("http")||~d.href.indexOf(e.host))&&(a.preventDefault(),e.href=d.href)},!1)}})(document,window.navigator,"standalone")</script>
         -->
 
-        <link rel="stylesheet" href="<%=rootPath%>css/normalize.css">
-        <link rel="stylesheet" href="<%=rootPath%>css/main.css">
-        <script src="<%=rootPath%>js/vendor/modernizr-2.6.2.min.js"></script>
+        <link rel="stylesheet" href="<%=cdnUrl%>css/normalize.css">
+        <link rel="stylesheet" href="<%=cdnUrl%>css/main.css">
+        <script src="<%=cdnUrl%>js/vendor/modernizr-2.6.2.min.js"></script>
         
         <style type="text/css">
         body {
@@ -202,10 +203,10 @@ try
 <% if ( q.getDataType() == null || request.getParameter("replace") != null || request.getParameter("edit") != null ) { %>
 	<div class="ctrl">
 		<% if ( request.getParameter("replace") != null || request.getParameter("edit") != null ) { %>
-		<a href="<%=q.getQ()%>"><img src="../img/icons/glyphish/113-navigation-mirror.png"/></a>
+		<a href="<%=q.getQ()%>"><img src="<%=cdnUrl%>img/icons/glyphish/113-navigation-mirror.png"/></a>
 		<% } %>
-		<a href="javascript:toggle_file()"><img id="file_enable" src="../img/icons/glyphish/68-paperclip.png"/></a>
-		<a href="<%=rootPath%>" target="_blank" style="float:right"><img src="../img/icons/glyphish/10-medical.png"/></a>
+		<a href="javascript:toggle_file()"><img id="file_enable" src="<%=cdnUrl%>img/icons/glyphish/68-paperclip.png"/></a>
+		<a href="<%=rootPath%>" target="_blank" style="float:right"><img src="<%=cdnUrl%>img/icons/glyphish/10-medical.png"/></a>
 	</div>
 
 	<div class="data">
@@ -232,10 +233,10 @@ try
 	</div>
 <% } else { %>
 	<div class="ctrl">
-		<a href="<%=q.getQ()%>?replace"><img src="../img/icons/glyphish/08-chat.png"/></a>	
-		<a href="<%=q.getQ()%>?edit"><img src="../img/icons/glyphish/19-gear.png"/></a>
-		<a href="<%=q.getQ()%>?clear"><img src="../img/icons/glyphish/22-skull-n-bones.png"/></a>	
-		<a href="<%=rootPath%>" target="_blank" style="float:right"><img src="../img/icons/glyphish/10-medical.png"/></a>
+		<a href="<%=q.getQ()%>?replace"><img src="<%=cdnUrl%>img/icons/glyphish/08-chat.png"/></a>	
+		<a href="<%=q.getQ()%>?edit"><img src="<%=cdnUrl%>img/icons/glyphish/19-gear.png"/></a>
+		<a href="<%=q.getQ()%>?clear"><img src="<%=cdnUrl%>img/icons/glyphish/22-skull-n-bones.png"/></a>	
+		<a href="<%=rootPath%>" target="_blank" style="float:right"><img src="<%=cdnUrl%>img/icons/glyphish/10-medical.png"/></a>
 	</div>
 	<div class="data">
 		<%=Factory.getServices().getHtmlRenderer().renderHtml(q)%>
@@ -244,8 +245,8 @@ try
 
 
 
-        <script src="<%=rootPath%>js/vendor/zepto.min.js"></script>
-        <script src="<%=rootPath%>js/helper.js"></script>
+        <script src="<%=cdnUrl%>js/vendor/zepto.min.js"></script>
+        <script src="<%=cdnUrl%>js/helper.js"></script>
 
 		<script>
 		Zepto(function($){
@@ -269,11 +270,18 @@ try
 		
 		function adjust_video_iframe(iframe)
 		{
-			var		width = iframe.contentWindow.document.body.scrollWidth;
-			var		height = width * 9 / 16;
-			var		scrollHeight = (Math.floor(height)) + "px";
-			
-			iframe.height = scrollHeight;
+			try
+			{
+				var		width = iframe.contentWindow.document.body.scrollWidth;
+				var		height = width * 9 / 16;
+				var		scrollHeight = (Math.floor(height)) + "px";
+				
+				iframe.height = scrollHeight;
+			}
+			catch (e)
+			{
+				
+			}
 		}
 		
 		function get_position()

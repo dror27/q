@@ -21,12 +21,13 @@
 [x] auto rtl
 [x] avoid over stretching images
 
+[x] optimize display of short messages (centered, large fonts)
+[x] make fonts ok for phone
+
 
 
 -- html/design --
 [ ] handle device rotation
-[ ] optimize display of short messages (centered, large fonts)
-[ ] make fonts ok for phone
 [ ] design fav icon
 [ ] design custom image for qrcode center
 [ ] move video auto resize code to iframe onload instead of total page

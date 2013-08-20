@@ -132,18 +132,19 @@ try
 			if ( items.containsKey("period") )
 				period = Integer.parseInt(items.get("period").getString("UTF-8"));	
 			
-			
 			// must have upload field
 			if ( items.containsKey("upload") )
 			{
+				String				text = items.get("text").getString("UTF-8").trim();
+				
 				// lease
-				if ( leaseManager.isLeaseOwner(q, device) || leaseManager.lease(q, device, period) )
+				if ( (text.length() > 0) && (leaseManager.isLeaseOwner(q, device) || leaseManager.lease(q, device, period)) )
 				{
 					// process
 					if ( !items.containsKey("edit") )
 						q.cleanData();
 					q.setDataType("post");
-					q.setTextData(items.get("text").getString("UTF-8"));
+					q.setTextData(text);
 					if ( items.containsKey("file") 
 								&& !StringUtils.isEmpty(items.get("file").getContentType()) 
 								&& items.get("file").getSize() > 0 )
@@ -310,7 +311,7 @@ try
 			<% if ( !leaseManager.isLeased(q) || leaseManager.isLeaseOwner(q, device) ) { %>
 				<a title="replace" href="<%=q.getQ()%>?replace"><img src="<%=cdnUrl%>img/icons/glyphish/08-chat.png"/></a>	
 				<a title="edit" href="<%=q.getQ()%>?edit"><img src="<%=cdnUrl%>img/icons/glyphish/19-gear.png"/></a>
-				<a title="clear" href="<%=q.getQ()%>?clear"><img src="<%=cdnUrl%>img/icons/glyphish/22-skull-n-bones.png"/></a>
+				<a title="clear" href="<%=q.getQ()%>?clear" onclick="return window.confirm('clear?')"><img src="<%=cdnUrl%>img/icons/glyphish/22-skull-n-bones.png"/></a>
 			<% } else { %>	
 				<a title="replace" class="disabled" x-href="<%=q.getQ()%>?replace" href="#" onclick="javascript:return false;"><img class="disabled-img" src="<%=cdnUrl%>img/icons/glyphish/08-chat-disabled.png"/></a>	
 				<a title="edit" class="disabled" x-href="<%=q.getQ()%>?edit" href="#" onclick="javascript:return false;"><img class="disabled-img" src="<%=cdnUrl%>img/icons/glyphish/19-gear-disabled.png"/></a>

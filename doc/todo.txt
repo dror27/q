@@ -27,8 +27,19 @@
 
 [x] lease management
 
+[x] add post upload page for setting protection period (free=4 hours, email=24 hours, pay=more)
+
+[x] allow posting user to change before period is over
+[x] allow for smaller then 1 hour leases (for free) - on update page
+
+[x] clear confirmation
+[x] ignore empty posts
+
 
 -- html/design --
+[ ] map of q around?
+
+
 [ ] handle device rotation
 [ ] design fav icon
 [ ] design custom image for qrcode center
@@ -39,9 +50,6 @@
 [ ] provide standard vars/data to q code (qs around, count of visits, etc, time to end of lease)
 [ ] swipe left/right for prec/next page content
 
-[ ] clear confirmation
-
-[ ] ignore empty posts
 
 [ ] cache smaller versions of large images?
 [ ] return 'last modified' on q and image pages to prevent reload
@@ -67,13 +75,10 @@
 [ ] add copyright notice for all thirdparty used files
 
 -- business logic --
-[ ] add post upload page for setting protection period (free=4 hours, email=24 hours, pay=more)
-[ ] allow posting user to change before period is over
-[ ] make period suitable for daily or hourly maintenance (24+slack, etc)
+[/] make period suitable for daily or hourly maintenance (24+slack, etc)
 [ ] manager versions (prev) of content on page
-[ ] AdWords
+[/] AdSense
 [ ] Paypal/lease
-[ ] allow for smaller then 1 hour leases (for free) - on update page
 
 --- management ---
 [ ] write management page (basic)

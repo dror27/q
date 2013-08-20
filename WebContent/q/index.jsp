@@ -327,7 +327,7 @@ try
 			if ( secs > 0 )
 			{
 				%>
-				<a class="lease" title="lease" href="<%=q.getQ()%>?lease"><img src="<%=cdnUrl%>img/icons/glyphish/54-lock.png"/>
+				<a class="lease" title="lease" href="#" x-lock="0" onclick="toggle_lock(); return false" x-href="<%=q.getQ()%>?lease"><img src="<%=cdnUrl%>img/icons/glyphish/54-lock.png"/>
 				<span id="secs" x-secs="<%=secs%>"></span>
 				</a>
 				<%
@@ -605,6 +605,8 @@ try
 				
 			}
 		}
+		
+		var lock_timeout_id = null;
 				
 		function init_lock()
 		{
@@ -635,6 +637,7 @@ try
 		
 		function update_lock(span)
 		{
+			lock_timeout_id = null;
 			
 			// calc seconds left
 			var		secs = span[0].getAttribute("x-secs");
@@ -647,16 +650,26 @@ try
 			{
 				var				fast = (sec_num <= 60);
 				
-				if ( !fast || (sec_num != Math.round(sec_float)) )
+				var		a = $(".lease");
+				var		xLock = 0;
+				if ( a.length == 1 )
+					xLock = parseInt(a[0].getAttribute("x-lock"), 10);
+				
+				if ( xLock != 0 )
+				{
+					var		ends = new Date(parseInt(secs, 10));
+					var 	text = formatHoursMinutesSeconds(ends.getHours(), ends.getMinutes(), ends.getSeconds()); 
+					
+					span.text(text);
+				}
+				else if ( !fast || (sec_num != Math.round(sec_float)) )
 				{
 					// format - http://stackoverflow.com/questions/6312993/javascript-seconds-to-time-with-format-hhmmss
 					var 	hours   = Math.floor(sec_num / 3600);
 				    var 	minutes = Math.floor((sec_num - (hours * 3600)) / 60);
 				    var 	seconds = sec_num - (hours * 3600) - (minutes * 60);
-				    if (hours   < 10) {hours   = "0"+hours;}
-				    if (minutes < 10) {minutes = "0"+minutes;}
-				    if (seconds < 10) {seconds = "0"+seconds;}
-				    var 	time    = hours+':'+minutes+':'+seconds;
+				    
+				    var 	time = formatHoursMinutesSeconds(hours, minutes, seconds);
 				    
 					// update 
 					span.text(time);
@@ -665,7 +678,7 @@ try
 					span.text("");
 	
 				// if here, run timer again
-				window.setTimeout(function() {update_lock(span);}, fast ? 500 : 1000);
+				lock_timeout_id = window.setTimeout(function() {update_lock(span);}, fast ? 500 : 1000);
 			}
 			else
 			{
@@ -692,6 +705,44 @@ try
 				}
 
 			}
+		}
+		
+		function toggle_lock()
+		{
+			try
+			{
+				// stop pending timeout
+				if ( lock_timeout_id != null )
+				{
+					window.clearTimeout(lock_timeout_id);
+					lock_timeout_id = null;
+				}
+				
+				// toggle
+				var		a = $(".lease");
+				if ( a.length == 1 )
+				{
+					var		xLock = parseInt(a[0].getAttribute("x-lock"), 10);
+					xLock = 1 - xLock;
+					a[0].setAttribute("x-lock", xLock);
+				}
+				
+				// update and start timeout
+				update_lock($("#secs"));
+			}
+			catch (e)
+			{
+				
+			}
+		}
+		
+		function formatHoursMinutesSeconds(hours, minutes, seconds)
+		{
+		    if (hours   < 10) {hours   = "0"+hours;}
+		    if (minutes < 10) {minutes = "0"+minutes;}
+		    if (seconds < 10) {seconds = "0"+seconds;}
+		    
+		    return hours+':'+minutes+':'+seconds;
 		}
 		
 		</script>

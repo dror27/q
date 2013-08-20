@@ -16,6 +16,12 @@
 
 [x] debug upload a picture from phone (apache 10 second upload timeout)
 
+[x] auto font resize (min/max size)
+[x] auto center
+[x] auto rtl
+[x] avoid over stretching images
+
+
 
 -- html/design --
 [ ] handle device rotation
@@ -30,6 +36,12 @@
 [ ] provide standard vars/data to q code (qs around, count of visits, etc, time to end of lease)
 [ ] swipe left/right for prec/next page content
 
+[ ] clear confirmation
+
+[ ] ignore empty posts
+
+[ ] choose nicer (Georgia?) font
+
 -- api ---
 [ ] simple api based on the stndard jsp/servlet
 [ ] param for output format (html/json)
@@ -38,6 +50,7 @@
 
 --- test ---
 [ ] add standard content pages that get created automatically, containing samples of different cases
+[ ] load test
 
 -- usability --
 [ ] js field validation segments on upload
@@ -70,6 +83,8 @@
 [ ] move to other server
 [ ] use maven?
 [ ] remove dependency on freebss
+[ ] new (hidden?) domain?
+[ ] bucket storage?
 
 
 --- investigate ---

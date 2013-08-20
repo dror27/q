@@ -210,11 +210,21 @@ try
         	margin: 5px;
         }
         div.data_img {
-        	padding-bottom:5px;
+        	padding-bottom: 5px;
+        }
+        div.data_varsize {
+        	display: inline;
+        	overflow: hidden;
+        	white-space: nowrap;
+        }
+        div.data_varsize p {
+        	display: inline;
+        	overflow: hidden;
+        	white-space: nowrap;
         }
         </style>
     </head>
-    <body>
+    <body onload="data_onload()">
 
     <!-- Add your site or application content here -->
 <% if ( q.getDataType() == null || request.getParameter("replace") != null || request.getParameter("edit") != null ) { %>
@@ -260,7 +270,7 @@ try
 		<% } %> 
 		<a href="<%=rootPath%>" target="_blank" style="float:right"><img src="<%=cdnUrl%>img/icons/glyphish/10-medical.png"/></a>
 	</div>
-	<div class="data">
+	<div id="data" class="data">
 		<% if ( request.getParameter("source") != null ) { 
 			if ( Factory.getServices().getHtmlRenderer().getImgRenderer().isImageQ(q) )
 			{
@@ -270,7 +280,7 @@ try
 			%><pre><%=q.getTextData()%></pre><%
 			
 		} else {
-			%><%=Factory.getServices().getHtmlRenderer().renderHtml(q)%><%
+			%><div id="data_varsize" class="data_varsize"><%=Factory.getServices().getHtmlRenderer().renderHtml(q)%></div><%
 		} %>
 	</div>
 <% } %>
@@ -287,8 +297,16 @@ try
 			  });
 			  
 			  get_position();
+			  
+			  
+			  auto_resize();
 			});
 			
+		function data_onload()
+		{
+			auto_resize_image();
+		}
+		
 		function toggle_file()
 		{
 			var		file = $('#file_div')[0];
@@ -357,6 +375,184 @@ try
 					  };
 			 
 			//alert("Error: " + errors[error.code]);
+		}
+		
+		function auto_resize()
+		{
+			try
+			{
+				// must have a data_varsize
+				var		varsize = $('#data_varsize');
+				if ( varsize == null || varsize.length == 0 )
+					return;
+				
+				// prepare
+				var		data = $("#data");
+				var		fontSize = parseInt(varsize.css("font-size"));
+				var		orgFontSize = fontSize;
+				var		orgHtml = varsize.html();
+				var		maxFontSize = 80;
+				var		maxWidth = data.width();
+				
+				// loop until overflows or too big
+				var		modHtml = orgHtml.replace("</p>", "</p><br/>");
+				varsize.html(modHtml)
+				while ( fontSize < maxFontSize )
+				{
+					var		nextFontSize = Math.min(Math.floor(fontSize * 3 / 2), maxFontSize);
+					
+					varsize.css("font-size", nextFontSize + "px");
+					var		nextWidth = varsize.width();
+					if ( nextWidth > maxWidth )
+						break;
+					
+					fontSize = nextFontSize;
+				}
+				
+				// set font size we've settled on
+				varsize.html(orgHtml);
+				varsize.css("font-size", fontSize + "px");
+				if ( fontSize != orgFontSize )
+					varsize.css("line-height", 1.05);
+				
+				// reset inner paragraphs
+				$("#data_varsize p").css("display", "block");
+				$("#data_varsize p").css("margin", "0px 0px " + Math.floor(fontSize / 2) + "px 0px");
+				
+				// auto-center
+				if ( is_auto_center(varsize.html()) )
+					data.css("text-align", "center");
+				
+				// auto rtl?
+				if ( is_auto_rtl(varsize.text()) )
+					data.css("direction", "rtl");				
+								
+			} catch (e)
+			{
+				
+			}
+		}
+		
+		function is_auto_center(html)
+		{
+			if ( html.indexOf("http://") > 0 )
+				return false;
+				
+			if ( html.indexOf("<ul") > 0 )
+				return false;
+				
+			if ( html.indexOf("<ol") > 0 )
+				return false;
+				
+			if ( html.indexOf("<h") > 0 )
+				return false;
+				
+			if ( html.indexOf("<div") > 0 )
+				return false;
+				
+			return true;
+		}
+		
+		function is_auto_rtl(text)
+		{
+			// try to use library code
+			if ( is_script_rtl(text) )
+				return true;
+			
+			// empty?
+			text = text.trim();
+			if ( text.length == 0 )
+				return false;
+			
+			// look at first char
+			ch0 = text.charCodeAt(0);
+			
+			// hebrew/arabic?
+			var		ranges = [
+					// hebrew - http://en.wikipedia.org/wiki/Unicode_and_HTML_for_the_Hebrew_alphabet
+					0x0591, 0x05F4, 
+					0xFB00, 0xFB00,
+					
+					// arabic - http://en.wikipedia.org/wiki/Arabic_script_in_Unicode
+					0x0600, 0x06FF,
+					0x0750, 0x077F,
+					0x08A0, 0x08FF,
+					0xFB50, 0xFDFF,
+					0xFE70, 0xFEFF,
+					0x10E60, 0x10E7F,
+					0x1EE00, 0x1EEFF					
+			];
+			for ( var n = 0 ; n < ranges.length ; n += 2)
+			if ( ch0 >= ranges[n] && ch0 <= ranges[n+1] )
+				return true;
+			
+			// if here, nop
+			return false;
+		}
+		
+		// image auto resize
+		function auto_resize_image()
+		{
+			try
+			{
+				// adjust image size?
+				var			img = $(".data_img img");
+				if ( img.length == 1 )
+				{
+					var			imgWidth = img.width();
+					var			naturalWidth = img[0].naturalWidth;
+					
+					if ( naturalWidth > 0 && naturalWidth < imgWidth )
+						img.width(naturalWidth);
+				}
+			} catch (e)
+			{
+				
+			}
+		}
+		
+		// credit: http://stackoverflow.com/questions/12006095/javascript-how-to-check-if-character-is-rtl
+		function is_script_rtl(t) {
+		    var d, s1, s2, bodies;
+
+		    //If the browser doesn’t support this, it probably doesn’t support Unicode 5.2
+		    if (!("getBoundingClientRect" in document.documentElement))
+		        return false;
+
+		    //Set up a testing DIV
+		    d = document.createElement('div');
+		    d.style.position = 'absolute';
+		    d.style.visibility = 'hidden';
+		    d.style.width = 'auto';
+		    d.style.height = 'auto';
+		    d.style.fontSize = '10px';
+		    d.style.fontFamily = "'Ahuramzda'";
+		    d.appendChild(document.createTextNode(t));
+
+		    s1 = document.createElement("span");
+		    s1.appendChild(document.createTextNode(t));
+		    d.appendChild(s1);
+
+		    s2 = document.createElement("span");
+		    s2.appendChild(document.createTextNode(t));
+		    d.appendChild(s2);
+
+		    d.appendChild(document.createTextNode(t));
+
+		    bodies = document.getElementsByTagName('body');
+		    if (bodies) {
+		        var body, r1, r2;
+
+		        body = bodies[0];
+		        body.appendChild(d);
+		        var r1 = s1.getBoundingClientRect();
+		        var r2 = s2.getBoundingClientRect();
+		        body.removeChild(d);
+
+		        return r1.left > r2.left;
+		    }
+
+		    return false;   
 		}
 		
 		</script>

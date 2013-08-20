@@ -213,6 +213,8 @@ try
         div.data_img {
         	padding-bottom: 5px;
         }
+        div.data_img img {
+        }
         div.data_varsize {
         	display: inline;
         	overflow: hidden;

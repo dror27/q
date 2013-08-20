@@ -23,6 +23,7 @@
 
 [x] optimize display of short messages (centered, large fonts)
 [x] make fonts ok for phone
+[x] choose nicer (Georgia?) font
 
 
 
@@ -41,7 +42,9 @@
 
 [ ] ignore empty posts
 
-[ ] choose nicer (Georgia?) font
+[ ] cache smaller versions of large images?
+[ ] return 'last modified' on q and image pages to prevent reload
+
 
 -- api ---
 [ ] simple api based on the stndard jsp/servlet

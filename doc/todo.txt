@@ -25,6 +25,7 @@
 [x] make fonts ok for phone
 [x] choose nicer (Georgia?) font
 
+[x] lease management
 
 
 -- html/design --
@@ -68,10 +69,10 @@
 [ ] add post upload page for setting protection period (free=4 hours, email=24 hours, pay=more)
 [ ] allow posting user to change before period is over
 [ ] make period suitable for daily or hourly maintenance (24+slack, etc)
-[ ] lease management
 [ ] manager versions (prev) of content on page
 [ ] AdWords
 [ ] Paypal/lease
+[ ] allow for smaller then 1 hour leases (for free) - on update page
 
 --- management ---
 [ ] write management page (basic)

@@ -34,6 +34,11 @@ CREATE TABLE `qs` (
   `longitude` double,
   `altitude` double,
   
+  `version` integer,
+  `lease_holder` char(64),
+  `lease_started_at` DATETIME,
+  `lease_ends_at` DATETIME 
+  
   PRIMARY KEY  (`id`)
   
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

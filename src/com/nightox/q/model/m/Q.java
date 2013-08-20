@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 
 import com.freebss.sprout.banner.util.StreamUtils;
 import com.nightox.q.model.base.DbObject;
@@ -25,12 +26,24 @@ public class Q extends DbObject {
 	Double		longitude;
 	Double		altitude;
 	
+	Integer		version;
+	String		leaseHolder;
+	Date		leaseStartedAt;
+	Date		leaseEndsAt;
+	
 	public void cleanData()
 	{
 		setDataType(null);
 		setBinaryData((byte[])null);
 		setContentType(null);
 		setTextData(null);
+	}
+	
+	public void cleanLease()
+	{
+		setLeaseHolder(null);
+		setLeaseStartedAt(null);
+		setLeaseEndsAt(null);
 	}
 	
 	public String getQ() {
@@ -143,6 +156,38 @@ public class Q extends DbObject {
 
 	public void setAltitude(Double altitude) {
 		this.altitude = altitude;
+	}
+
+	public String getLeaseHolder() {
+		return leaseHolder;
+	}
+
+	public void setLeaseHolder(String leaseHolder) {
+		this.leaseHolder = leaseHolder;
+	}
+
+	public Date getLeaseStartedAt() {
+		return leaseStartedAt;
+	}
+
+	public void setLeaseStartedAt(Date leaseStartedAt) {
+		this.leaseStartedAt = leaseStartedAt;
+	}
+
+	public Date getLeaseEndsAt() {
+		return leaseEndsAt;
+	}
+
+	public void setLeaseEndsAt(Date leaseEndsAt) {
+		this.leaseEndsAt = leaseEndsAt;
+	}
+
+	public Integer getVersion() {
+		return version;
+	}
+
+	public void setVersion(Integer version) {
+		this.version = version;
 	}
 	
 }

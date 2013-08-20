@@ -1,24 +1,27 @@
-<%@page import="java.text.DecimalFormat"%><%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringEscapeUtils"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
+<%@page import="com.nightox.q.logic.LeaseManager"%><%@page import="java.text.DecimalFormat"%><%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringEscapeUtils"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
 
 final Log			log = LogFactory.getLog(this.getClass());
+
+// some accessors
+final LeaseManager	leaseManager = Factory.getServices().getLeaseManager();
 
 // some constants
 final String		COOKIE_NAME = "Q_694601798f5a490e9a231f2805215e6b";
 final String		rootPath = Factory.getConfProperty("html.rootPath");
 final String		cdnUrl = Factory.getConfProperty("html.cdnUrl");
 
-// first thing first ... we must have a cookie 
-String		cookie = null;
+// first thing first ... we must have a device cookie 
+String		device = null;
 if ( request.getCookies() != null )
 	for ( Cookie c : request.getCookies() )
 		if ( c.getName().equals(COOKIE_NAME) )
 		{
-			cookie = c.getValue();
+			device = c.getValue();
 			break;
 		}
-if ( cookie == null )
-	cookie = Factory.getServices().getqManager().newQ();
-Cookie				c = new Cookie(COOKIE_NAME, cookie);
+if ( device == null )
+	device = Factory.getServices().getqManager().newQ();
+Cookie				c = new Cookie(COOKIE_NAME, device);
 c.setMaxAge(Integer.MIN_VALUE);
 response.addCookie(c);
 
@@ -63,10 +66,14 @@ try
 		return;
 	}
 	
-	// clear? (TEMP)
+	// clear?
 	if ( request.getParameter("clear") != null )
 	{
-		q.cleanData();
+		if ( !leaseManager.isLeased(q) || leaseManager.isLeaseOwner(q, device) )
+		{
+			q.cleanData();
+			q.cleanLease();
+		}
 		
 		// redirect to view page
 		response.sendRedirect(q.getQ());
@@ -122,26 +129,29 @@ try
 			// must have upload field
 			if ( items.containsKey("upload") )
 			{
-				// process
-				if ( !items.containsKey("edit") )
-					q.cleanData();
-				q.setDataType("post");
-				q.setTextData(items.get("text").getString("UTF-8"));
-				if ( items.containsKey("file") 
-							&& !StringUtils.isEmpty(items.get("file").getContentType()) 
-							&& items.get("file").getSize() > 0 )
+				// lease
+				if ( leaseManager.lease(q, device) )
 				{
-					q.setBinaryData(items.get("file").getInputStream());
-					q.setContentType(items.get("file").getContentType());
+					// process
+					if ( !items.containsKey("edit") )
+						q.cleanData();
+					q.setDataType("post");
+					q.setTextData(items.get("text").getString("UTF-8"));
+					if ( items.containsKey("file") 
+								&& !StringUtils.isEmpty(items.get("file").getContentType()) 
+								&& items.get("file").getSize() > 0 )
+					{
+						q.setBinaryData(items.get("file").getInputStream());
+						q.setContentType(items.get("file").getContentType());
+					}
 				}
-				
-				
-				// redirect to view page
-				log.info("redirecting");
 			}
 		} catch (Throwable e) {
 			log.error("upload failed", e);
 		}
+
+		// redirect to view page
+		log.info("redirecting");
 		response.sendRedirect(q.getQ());
 		return;
 	}
@@ -206,7 +216,21 @@ try
         	padding-left: 5px;
         	padding-right: 5px;
         	text-decoration: none !important;
+        	color: black;
         }
+        div.ctrl a:visited {
+        	color: black;
+        }
+        div.ctrl a:hover {
+        	color: black;
+        }
+        div.ctrl a:active {
+        	color: black;
+        }
+        div.ctrl a.lease span {
+        	font-size: 0.5em;
+        }
+        
         div.data {
         	margin: 5px;
         }
@@ -229,7 +253,6 @@ try
     </head>
     <body onload="data_onload()">
 
-    <!-- Add your site or application content here -->
 <% if ( q.getDataType() == null || request.getParameter("replace") != null || request.getParameter("edit") != null ) { %>
 	<div class="ctrl">
 		<% if ( request.getParameter("replace") != null || request.getParameter("edit") != null ) { %>
@@ -263,15 +286,37 @@ try
 	</div>
 <% } else { %>
 	<div class="ctrl">
-		<% if ( request.getParameter("source") != null ) { %>
-		<a title="back" href="<%=q.getQ()%>"><img src="<%=cdnUrl%>img/icons/glyphish/113-navigation-mirror.png"/></a>
+		<% if ( request.getParameter("source") != null || request.getParameter("lease") != null ) { %>
+			<a title="back" href="<%=q.getQ()%>"><img src="<%=cdnUrl%>img/icons/glyphish/113-navigation-mirror.png"/></a>
 		<% } else { %>
-		<a title="replace" href="<%=q.getQ()%>?replace"><img src="<%=cdnUrl%>img/icons/glyphish/08-chat.png"/></a>	
-		<a title="edit" href="<%=q.getQ()%>?edit"><img src="<%=cdnUrl%>img/icons/glyphish/19-gear.png"/></a>
-		<a title="clear" href="<%=q.getQ()%>?clear"><img src="<%=cdnUrl%>img/icons/glyphish/22-skull-n-bones.png"/></a>	
-		<a title="source" href="<%=q.getQ()%>?source"><img src="<%=cdnUrl%>img/icons/glyphish/12-eye.png"/></a>
-		<% } %> 
+			<% if ( !leaseManager.isLeased(q) || leaseManager.isLeaseOwner(q, device) ) { %>
+				<a title="replace" href="<%=q.getQ()%>?replace"><img src="<%=cdnUrl%>img/icons/glyphish/08-chat.png"/></a>	
+				<a title="edit" href="<%=q.getQ()%>?edit"><img src="<%=cdnUrl%>img/icons/glyphish/19-gear.png"/></a>
+				<a title="clear" href="<%=q.getQ()%>?clear"><img src="<%=cdnUrl%>img/icons/glyphish/22-skull-n-bones.png"/></a>
+			<% } else { %>	
+				<a title="replace" class="disabled" x-href="<%=q.getQ()%>?replace" href="#" onclick="javascript:return false;"><img class="disabled-img" src="<%=cdnUrl%>img/icons/glyphish/08-chat-disabled.png"/></a>	
+				<a title="edit" class="disabled" x-href="<%=q.getQ()%>?edit" href="#" onclick="javascript:return false;"><img class="disabled-img" src="<%=cdnUrl%>img/icons/glyphish/19-gear-disabled.png"/></a>
+				<a title="clear" class="disabled" x-href="<%=q.getQ()%>?clear" href="#" onclick="javascript:return false;"><img class="disabled-img" src="<%=cdnUrl%>img/icons/glyphish/22-skull-n-bones-disabled.png"/></a>
+			<% } %> 
+			<a title="source" href="<%=q.getQ()%>?source"><img src="<%=cdnUrl%>img/icons/glyphish/12-eye.png"/></a>
+			<% } %> 
 		<a href="<%=rootPath%>" target="_blank" style="float:right"><img src="<%=cdnUrl%>img/icons/glyphish/10-medical.png"/></a>
+		
+		<%
+		if ( request.getParameter("source") == null && request.getParameter("lease") == null)
+		{
+			int			secs = leaseManager.secondsToLeaseEnd(q);
+			if ( secs > 0 )
+			{
+				%>
+				<a class="lease" title="lease" href="<%=q.getQ()%>?lease"><img src="<%=cdnUrl%>img/icons/glyphish/54-lock.png"/>
+				<span id="secs" x-secs="<%=secs%>"></span>
+				</a>
+				<%
+			}
+		}
+		%>
+		
 	</div>
 	<div id="data" class="data">
 		<% if ( request.getParameter("source") != null ) { 
@@ -282,6 +327,19 @@ try
 			}
 			%><pre><%=q.getTextData()%></pre><%
 			
+		} else if ( request.getParameter("lease") != null ) {
+			
+			String		text;
+			if ( !leaseManager.isLeased(q) )
+				text = leaseManager.getUnleasedText();
+			else if ( leaseManager.isLeaseOwner(q, device) )
+				text = leaseManager.getLeasedToHolderText();
+			else
+				text = leaseManager.getLeasedToOther();
+			
+			text = text.trim();
+			
+			%><pre><%=text%></pre><%
 		} else {
 			%><div id="data_varsize" class="data_varsize"><%=Factory.getServices().getHtmlRenderer().renderHtml(q)%></div><%
 		} %>
@@ -300,9 +358,9 @@ try
 			  });
 			  
 			  get_position();
-			  
-			  
 			  auto_resize();
+			  init_lock();
+			 
 			});
 			
 		function data_onload()
@@ -391,7 +449,7 @@ try
 				
 				// prepare
 				var		data = $("#data");
-				var		fontSize = parseInt(varsize.css("font-size"));
+				var		fontSize = parseInt(varsize.css("font-size"), 10);
 				var		orgFontSize = fontSize;
 				var		orgHtml = varsize.html();
 				var		maxFontSize = 80;
@@ -419,9 +477,10 @@ try
 					varsize.css("line-height", 1.05);
 				
 				// reset inner paragraphs
+				var					paraSpacing = Math.floor(fontSize / 2);
 				$("#data_varsize p").css("display", "block");
-				$("#data_varsize p").css("margin", "0px 0px " + (Math.floor(fontSize / 2) - 10) + "px 0px");
-				$("#data_varsize p").css("padding", "0px 0px 10px 0px");
+				$("#data_varsize p").css("margin", "0px 0px " + 0 + "px 0px");
+				$("#data_varsize p").css("padding", "0px 0px " + paraSpacing + "px 0px");
 				
 				// auto-center
 				if ( is_auto_center(varsize.html()) )
@@ -508,6 +567,94 @@ try
 			} catch (e)
 			{
 				
+			}
+		}
+				
+		function init_lock()
+		{
+			try
+			{
+				// extract
+				var		span = $("#secs");
+				if ( span.length == 0 )
+					return;
+				var		secs = span[0].getAttribute("x-secs");
+				
+				// start a timer?
+				if ( secs > 0 )				
+				{
+					// update to reflect seconds since 1970 using local tz
+					var		now = new Date();
+					var		date = new Date(now.getTime() + secs * 1000);
+					span[0].setAttribute("x-secs", date.getTime());
+					
+					update_lock(span);
+				}
+				
+			} catch (e)
+			{
+				
+			}
+		}
+		
+		function update_lock(span)
+		{
+			
+			// calc seconds left
+			var		secs = span[0].getAttribute("x-secs");
+			var		now = new Date();
+			var		sec_float = (secs - now.getTime()) / 1000;
+			var		sec_num = Math.ceil(sec_float);
+			
+			// seconds left?
+			if ( sec_num >= 0 )
+			{
+				var				fast = (sec_num <= 60);
+				
+				if ( !fast || (sec_num != Math.round(sec_float)) )
+				{
+					// format - http://stackoverflow.com/questions/6312993/javascript-seconds-to-time-with-format-hhmmss
+					var 	hours   = Math.floor(sec_num / 3600);
+				    var 	minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+				    var 	seconds = sec_num - (hours * 3600) - (minutes * 60);
+				    if (hours   < 10) {hours   = "0"+hours;}
+				    if (minutes < 10) {minutes = "0"+minutes;}
+				    if (seconds < 10) {seconds = "0"+seconds;}
+				    var 	time    = hours+':'+minutes+':'+seconds;
+				    
+					// update 
+					span.text(time);
+				}
+				else
+					span.text("");
+	
+				// if here, run timer again
+				window.setTimeout(function() {update_lock(span);}, fast ? 500 : 1000);
+			}
+			else
+			{
+				// not locked any more				
+				$(".lease").css("display", "none");
+				
+				// update disabled links
+				var			links = $(".disabled");
+				for ( var n = 0 ; n < links.length ; n++ )
+				{
+					var		link = links[n];
+					
+					link.onclick = "";
+					link.href = link.getAttribute("x-href");					
+				}
+				
+				// update disabled images
+				var			imgs = $(".disabled-img");
+				for ( var n = 0 ; n < imgs.length ; n++ )
+				{
+					var 	img = imgs[n];
+					
+					img.src = img.src.replace("-disabled", "");
+				}
+
 			}
 		}
 		

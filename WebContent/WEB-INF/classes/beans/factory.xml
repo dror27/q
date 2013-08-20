@@ -87,6 +87,7 @@
 		<property name="services">
 			<bean class="com.nightox.q.beans.Services">
 				<property name="htmlRenderer" ref="HtmlRenderer"/>
+				<property name="leaseManager" ref="LeaseManager"/>
 			</bean>
 		</property>
 		
@@ -103,6 +104,30 @@
 	</bean>
 	<bean id="CmdBaseSuper" class="com.nightox.q.api.cmd.base.CmdBase">
 		<property name="minUserRole" value="super"/>
+	</bean>
+
+	<bean id="LeaseManager" class="com.nightox.q.logic.LeaseManager">
+		<property name="unleasedText">
+			<value>
+			<![CDATA[
+				Come on ... grab it!
+			]]>
+			</value>
+		</property>
+		<property name="leasedToHolderText">
+			<value>
+			<![CDATA[
+				It's all yours ... have a blast!
+			]]>
+			</value>
+		</property>
+		<property name="leasedToOther">
+			<value>
+			<![CDATA[
+				Taken for now .. but there is hope ... just print your own ... press + sign at top! 
+			]]>
+			</value>
+		</property>
 	</bean>
 
 	<bean id="HtmlRenderer" class="com.nightox.q.html.HtmlRenderer">

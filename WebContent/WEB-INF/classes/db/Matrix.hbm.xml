@@ -22,6 +22,11 @@
 		<property name="latitude"/>
 		<property name="longitude"/>
 		<property name="altitude"/>
+
+		<property name="version"/>
+		<property name="leaseHolder" column="lease_holder"/>
+		<property name="leaseStartedAt" column="lease_started_at"/>
+		<property name="leaseEndsAt" column="lease_ends_at"/>
 	</class>
 	
 

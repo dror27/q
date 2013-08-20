@@ -7,12 +7,13 @@ import com.nightox.q.model.m.Q;
 public class LeaseManager {
 
 	private int			defaultLeaseMinutes = 60;
+	private int			maxLeaseMinutes = 1440;
 	
 	private String		unleasedText;
 	private String		leasedToHolderText;
 	private String		leasedToOther;
 	
-	public boolean lease(Q q, String holder)
+	public boolean lease(Q q, String holder, int period)
 	{
 		// must not be leased
 		if ( isLeased(q) )
@@ -23,8 +24,13 @@ public class LeaseManager {
 		q.setLeaseHolder(holder);
 		q.setLeaseStartedAt(now.getTime());
 		
+		// adjust period
+		if ( period <= 0 )
+			period = defaultLeaseMinutes;
+		period = Math.min(period, maxLeaseMinutes);
+		
 		// setup lease end
-		now.add(Calendar.MINUTE, defaultLeaseMinutes);
+		now.add(Calendar.MINUTE, period);
 		q.setLeaseEndsAt(now.getTime());
 		
 		return true;
@@ -92,6 +98,14 @@ public class LeaseManager {
 
 	public void setLeasedToOther(String leasedToOther) {
 		this.leasedToOther = leasedToOther;
+	}
+
+	public int getMaxLeaseMinutes() {
+		return maxLeaseMinutes;
+	}
+
+	public void setMaxLeaseMinutes(int maxLeaseMinutes) {
+		this.maxLeaseMinutes = maxLeaseMinutes;
 	}
 	
 }

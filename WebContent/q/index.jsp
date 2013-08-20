@@ -127,11 +127,17 @@ try
 				items.put(item.getFieldName(), item);
 			}
 			
+			// get period
+			int						period = 0; // default
+			if ( items.containsKey("period") )
+				period = Integer.parseInt(items.get("period").getString("UTF-8"));	
+			
+			
 			// must have upload field
 			if ( items.containsKey("upload") )
 			{
 				// lease
-				if ( leaseManager.lease(q, device) )
+				if ( leaseManager.isLeaseOwner(q, device) || leaseManager.lease(q, device, period) )
 				{
 					// process
 					if ( !items.containsKey("edit") )
@@ -280,6 +286,17 @@ try
 		%><%=StringEscapeUtils.escapeHtml(q.getTextData())%><%
 	}
 	%></textarea>
+	<% if ( request.getParameter("edit") == null ) { %>
+	<div class="button_div">
+		<select id="period" name="period">
+			<option value="1">Blinker - 60s</option>
+			<option value="10">Be Back Soon - 10m</option>
+			<option value="60" selected>Meet You Here - 1h</option>
+			<option value="480">Working Shifts - 8h</option>
+			<option value="1440">Call It A Day - 1d</option>
+		</select>
+	</div>
+	<% } %>
 	<div class="button_div">
 		<input type="submit" name="post" value="Post"/>
 	</div>

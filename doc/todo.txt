@@ -39,7 +39,6 @@
 -- html/design --
 [ ] map of q around?
 
-
 [ ] handle device rotation
 [ ] design fav icon
 [ ] design custom image for qrcode center

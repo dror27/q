@@ -9,6 +9,7 @@ final LeaseManager	leaseManager = Factory.getServices().getLeaseManager();
 final String		COOKIE_NAME = "Q_694601798f5a490e9a231f2805215e6b";
 final String		rootPath = Factory.getConfProperty("html.rootPath");
 final String		cdnUrl = Factory.getConfProperty("html.cdnUrl");
+final boolean		adsense = false;
 
 // first thing first ... we must have a device cookie 
 String		device = null;
@@ -318,6 +319,24 @@ try
 		%>
 		
 	</div>
+
+	<% if ( adsense ) { %>
+	<div id="adsense">
+		<script type="text/javascript"><!--
+		google_ad_client = "ca-pub-4649998862550053";
+		/* q0 */
+		google_ad_slot = "3002532647";
+		google_ad_width = 320;
+		google_ad_height = 50;
+		//-->
+		</script>
+		<script type="text/javascript"
+		src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+		</script>	
+	</div>
+	<% } %>
+
+
 	<div id="data" class="data">
 		<% if ( request.getParameter("source") != null ) { 
 			if ( Factory.getServices().getHtmlRenderer().getImgRenderer().isImageQ(q) )

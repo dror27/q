@@ -45,6 +45,8 @@
 -- html/design --
 
 [/] !!! line folding is broken
+[ ] password protection option?
+[ ] longer tags against email
 
 
 [ ] map of q around?
@@ -67,8 +69,6 @@
 [ ] attachment types other then image
 [ ] solve visual glitch that causes loaded (large) images to show up as huge initially on computer browser (before being resized)
 
-[ ] password protection option?
-[ ] longer tags against email
 
 [ ] bring past version using ajax?
 

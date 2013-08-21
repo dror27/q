@@ -358,7 +358,7 @@ try
 	<div class="button_div" id="file_div" style="display:none">
 		<input id="file" name="file" type="file" placeholder="upload image here">
 	</div>
-	<textarea id="text" name="text" cols="25" rows="6" placeholder="type text here"><%
+	<textarea id="text" name="text" cols="23" rows="6" placeholder="type text here"><%
 	if ( q.getTextData() != null && request.getParameter("edit") != null ) {
 		%><%=StringEscapeUtils.escapeHtml(q.getTextData())%><%
 	}

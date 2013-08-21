@@ -35,7 +35,11 @@ public class ImgRenderer {
 		if ( imageSize != null && imageSize.width > 300 )
 			widthAttr = "width=\"100%\"";
 		
-		return String.format("<div class=\"data_img\"><img x-width=\"0\" %s src=\"%s?image\"/></div>", widthAttr, q.getQ());
+		String			url = q.getQ() + "?image";
+		if ( q.getVersion() != null )
+			url += "&version=" + q.getVersion();
+		
+		return String.format("<div class=\"data_img\"><img x-width=\"0\" %s src=\"%s\"/></div>", widthAttr, url);
 	}
 
 	public Dimension getImageSize(Q q) 

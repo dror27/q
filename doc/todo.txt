@@ -37,6 +37,8 @@
 
 
 -- html/design --
+[ ] !!! line folding is broken
+
 [ ] map of q around?
 
 [ ] handle device rotation
@@ -60,7 +62,10 @@
 [ ] password protection option?
 [ ] longer tags against email
 
-
+[ ] past versions on upload form
+[ ] bring past version using ajax?
+[ ] past versions source display
+[ ] disable editing/clearing/replacing of past versions
 
 -- api ---
 [ ] simple api based on the stndard jsp/servlet
@@ -72,6 +77,8 @@
 [ ] add standard content pages that get created automatically, containing samples of different cases
 [ ] load test
 [ ] compatability test using BrowserStack
+[ ] load test server. problem with concurrent access?
+
 
 -- usability --
 [ ] js field validation segments on upload
@@ -103,8 +110,8 @@
 [ ] remove dependency on freebss
 [ ] new (hidden?) domain?
 [ ] bucket storage?
+[ ] add database indexes
 
 
 --- investigate ---
-[ ] why are resources sometimes returning with 304 after an update on the server? 
-[ ] load test server. problem with concurrent access?
+[ ] why are resources sometimes returning with 304 after an update on the server? (tomcat?, not showing up after move to apache2)

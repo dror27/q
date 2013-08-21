@@ -31,6 +31,27 @@ public class Q extends DbObject {
 	Date		leaseStartedAt;
 	Date		leaseEndsAt;
 	
+	public Q()
+	{
+		super();
+	}
+	
+	public Q(String qid)
+	{
+		super();
+		
+		this.q = qid;
+	}
+	
+	public Q(Q other)
+	{
+		super();
+		this.q = other.getQ();
+		this.latitude = other.getLatitude();
+		this.longitude = other.getLongitude();
+		this.altitude = other.getAltitude();
+	}
+	
 	public void cleanData()
 	{
 		setDataType(null);
@@ -188,6 +209,12 @@ public class Q extends DbObject {
 
 	public void setVersion(Integer version) {
 		this.version = version;
+	}
+	
+	public void setAutoVersion()
+	{
+		// since ids are generated in an sequential fashion, they can serve as (sparse)
+		this.version = getId();
 	}
 	
 }

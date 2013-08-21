@@ -1,4 +1,4 @@
-<%@page import="java.io.InputStream"%><%@page import="com.nightox.q.logic.LeaseManager"%><%@page import="java.text.DecimalFormat"%><%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringEscapeUtils"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
+<%@page import="org.hibernate.Criteria"%><%@page import="java.text.SimpleDateFormat"%><%@page import="java.text.DateFormat"%><%@page import="org.hibernate.criterion.Order"%><%@page import="java.util.Date"%><%@page import="org.hibernate.criterion.Restrictions"%><%@page import="java.io.InputStream"%><%@page import="com.nightox.q.logic.LeaseManager"%><%@page import="java.text.DecimalFormat"%><%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringEscapeUtils"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
 
 final Log			log = LogFactory.getLog(this.getClass());
 
@@ -10,6 +10,8 @@ final String		COOKIE_NAME = "Q_694601798f5a490e9a231f2805215e6b";
 final String		rootPath = Factory.getConfProperty("html.rootPath");
 final String		cdnUrl = Factory.getConfProperty("html.cdnUrl");
 final boolean		adsense = false;
+
+int					version = (request.getParameter("version") != null) ? Integer.parseInt(request.getParameter("version")) : 0;
 
 // first thing first ... we must have a device cookie 
 String		device = null;
@@ -36,12 +38,29 @@ try
 	Q					q = null;
 	if ( Factory.getServices().getqManager().isValidQ(qid) )
 	{
-		// fetch or create
-		q = (Q)DbObject.getByProperty(Q.class, "q", qid, false);
+		// fetch version?
+		if ( version > 0 )
+		{
+			q = (Q)Database.getSession().createCriteria(Q.class)
+					.add(Restrictions.eq("q", qid))
+					.add(Restrictions.eq("version", version))
+					.uniqueResult();
+			if ( q == null )
+				version = 0;
+		}
+		
+		// fetch?
 		if ( q == null )
 		{
-			q = new Q();
-			q.setQ(qid);
+			q = (Q)Database.getSession().createCriteria(Q.class)
+					.add(Restrictions.eq("q", qid))
+					.add(Restrictions.isNull("version"))
+					.uniqueResult();
+		}			
+		
+		if ( q == null )
+		{
+			q = new Q(qid);
 			q.save();
 		}
 	}
@@ -70,10 +89,14 @@ try
 	// clear?
 	if ( request.getParameter("clear") != null )
 	{
-		if ( !leaseManager.isLeased(q) || leaseManager.isLeaseOwner(q, device) )
+		if ( (!leaseManager.isLeased(q) || leaseManager.isLeaseOwner(q, device)) && (version <= 0) )
 		{
-			q.cleanData();
-			q.cleanLease();
+			// push down current as a version
+			q.setAutoVersion();
+			
+			// create a new top
+			q = new Q(q);
+			q.save();
 		}
 		
 		// redirect to view page
@@ -97,7 +120,7 @@ try
 	}			
 	
 	// uploading?
-	if ( ServletFileUpload.isMultipartContent(request) )
+	if ( ServletFileUpload.isMultipartContent(request) && (version <= 0) )
 	{
 		try
 		{
@@ -152,16 +175,26 @@ try
 				if ( hasContent && (leaseManager.isLeaseOwner(q, device) || leaseManager.lease(q, device, period)) )
 				{
 					// process
+					boolean			ok = true;
 					if ( !items.containsKey("edit") )
-						q.cleanData();
-					q.setDataType("post");
-					q.setTextData(text);
-					if ( items.containsKey("file") 
-								&& !StringUtils.isEmpty(items.get("file").getContentType()) 
-								&& items.get("file").getSize() > 0 )
 					{
-						q.setBinaryData(fileInputStream);
-						q.setContentType(fileContentType);
+						q.setAutoVersion();
+						q = new Q(q);
+						q.save();
+						ok = leaseManager.lease(q, device, period);
+					}
+					
+					if ( ok )
+					{
+						q.setDataType("post");
+						q.setTextData(text);
+						if ( items.containsKey("file") 
+									&& !StringUtils.isEmpty(items.get("file").getContentType()) 
+									&& items.get("file").getSize() > 0 )
+						{
+							q.setBinaryData(fileInputStream);
+							q.setContentType(fileContentType);
+						}
 					}
 				}
 			}
@@ -226,6 +259,9 @@ try
         	padding-top: 5px;
         	padding-bottom: 5px;
         }
+        div.ctrl2 {
+        	border-top: 1px solid #99CCFF;
+        }
         div.button_div {
         	padding-top: 5px;
         	padding-bottom: 5px;
@@ -272,12 +308,19 @@ try
     </head>
     <body onload="data_onload()">
 
-<% if ( q.getDataType() == null || request.getParameter("replace") != null || request.getParameter("edit") != null ) { %>
+<% 
+	String		backUrl = q.getQ();
+	if ( request.getParameter("version") != null )
+		backUrl += "?version=" + request.getParameter("version");
+
+
+
+	if ( q.getDataType() == null || request.getParameter("replace") != null || request.getParameter("edit") != null ) { %>
 	<div class="ctrl">
 		<% if ( request.getParameter("replace") != null || request.getParameter("edit") != null ) { %>
 		<a title="back" href="<%=q.getQ()%>"><img src="<%=cdnUrl%>img/icons/glyphish/113-navigation-mirror.png"/></a>
 		<% } %>
-		<a title="attach" href="javascript:toggle_file()"><img id="file_enable" src="<%=cdnUrl%>img/icons/glyphish/68-paperclip.png"/></a>
+		<a title="attach" href="javascript:toggle_elem('#file_div')"><img id="file_enable" src="<%=cdnUrl%>img/icons/glyphish/68-paperclip.png"/></a>
 		<a title="print" href="<%=rootPath%>" target="_blank" style="float:right"><img src="<%=cdnUrl%>img/icons/glyphish/10-medical.png"/></a>
 	</div>
 
@@ -314,10 +357,10 @@ try
 	</div>
 	</form>
 	</div>
-<% } else { %>
+<% } else {	%>
 	<div class="ctrl">
 		<% if ( request.getParameter("source") != null || request.getParameter("lease") != null ) { %>
-			<a title="back" href="<%=q.getQ()%>"><img src="<%=cdnUrl%>img/icons/glyphish/113-navigation-mirror.png"/></a>
+			<a title="back" href="<%=backUrl%>"><img src="<%=cdnUrl%>img/icons/glyphish/113-navigation-mirror.png"/></a>
 		<% } else { %>
 			<% if ( !leaseManager.isLeased(q) || leaseManager.isLeaseOwner(q, device) ) { %>
 				<a title="replace" href="<%=q.getQ()%>?replace"><img src="<%=cdnUrl%>img/icons/glyphish/08-chat.png"/></a>	
@@ -328,7 +371,7 @@ try
 				<a title="edit" class="disabled" x-href="<%=q.getQ()%>?edit" href="#" onclick="javascript:return false;"><img class="disabled-img" src="<%=cdnUrl%>img/icons/glyphish/19-gear-disabled.png"/></a>
 				<a title="clear" class="disabled" x-href="<%=q.getQ()%>?clear" href="#" onclick="javascript:return false;"><img class="disabled-img" src="<%=cdnUrl%>img/icons/glyphish/22-skull-n-bones-disabled.png"/></a>
 			<% } %> 
-			<a title="source" href="<%=q.getQ()%>?source"><img src="<%=cdnUrl%>img/icons/glyphish/12-eye.png"/></a>
+			<a title="inspect" href="#" x-lock="0" onclick="toggle_elem('#ctrl2'); return false"><img src="<%=cdnUrl%>img/icons/glyphish/12-eye.png"/></a>
 			<% } %> 
 		<a href="<%=rootPath%>" target="_blank" style="float:right"><img src="<%=cdnUrl%>img/icons/glyphish/10-medical.png"/></a>
 		
@@ -348,6 +391,66 @@ try
 		%>
 		
 	</div>
+	
+	<% if ( request.getParameter("source") == null && request.getParameter("lease") == null ) { %>
+	<div class="ctrl ctrl2" id="ctrl2" <%=((request.getParameter("version") == null) ? "style=\"display:none\"" : "")%>>
+		<%
+			String		sourceUrl = q.getQ() + "?source";
+			if ( request.getParameter("version") != null )
+				sourceUrl += "&version=" + request.getParameter("version");
+		%>
+		<a title="source" href="<%=sourceUrl%>"><img src="<%=cdnUrl%>img/icons/glyphish/179-notepad.png"/></a>
+		
+		<%
+			List<Q>		past = Database.getSession().createCriteria(Q.class)
+											.add(Restrictions.eq("q", qid))
+											.add(Restrictions.isNotNull("version"))
+											.add(Restrictions.isNotNull("dataType"))
+											.addOrder(Order.desc("version"))
+											.setMaxResults(100)
+											.list();
+			if ( past != null && !past.isEmpty() )
+			{
+				%>
+				<select id="versions" onchange="version_selected('<%=qid%>')">
+					<option value="0"><%=((request.getParameter("version") != null) ? "current version" : "past versions ...")%></option>
+					<% 
+						DateFormat		df = new SimpleDateFormat("dd/MM");
+						int				limit = 18;
+						for ( Q q1 : past ) 
+						{
+							String		preview = "";
+							if ( q1.getLeaseStartedAt() != null )
+								preview += " " + df.format(q1.getLeaseStartedAt());
+							
+							String		text = q1.getTextData();
+							if ( StringUtils.isEmpty(text) && (q1.getContentType() != null) )
+								text = "[" + q1.getContentType() + "]";
+							
+							if ( !StringUtils.isEmpty(text) )
+							{
+								if ( text.length() < limit )
+									preview += " " + text;
+								else
+									preview += " " + text.substring(0, limit - 4) + " ...";
+							}
+							if ( preview.length() == 0 )
+								preview += " " + q1.getVersion();
+							preview = preview.trim();
+							
+							String			selected = (version == q1.getVersion()) ? "selected" : "";
+							
+							%>
+							<option value="<%=q1.getVersion()%>" <%=selected%>><%=preview%></option>
+							<%
+						}
+					%>
+				</select>
+				<%				
+			}
+		%>
+	</div>
+	<% } %>
 
 	<% if ( adsense ) { %>
 	<div id="adsense">
@@ -405,7 +508,9 @@ try
 				adjust_video_iframe(iframe);
 			  });
 			  
+			  <% if (request.getParameter("version") == null ) { %>
 			  get_position();
+			  <% } %>
 			  auto_resize();
 			  init_lock();
 			 
@@ -416,17 +521,17 @@ try
 			auto_resize_image();
 		}
 		
-		function toggle_file()
+		function toggle_elem(query)
 		{
-			var		file = $('#file_div')[0];
-			var		display = file.style.display;
+			var		elem = $(query)[0];
+			var		display = elem.style.display;
 			
 			if ( display == 'none' )
-				file.style.display = "";
+				elem.style.display = "";
 			else
-				file.style.display = "none";
+				elem.style.display = "none";
 		}
-		
+
 		function adjust_video_iframe(iframe)
 		{
 			try
@@ -755,6 +860,16 @@ try
 		    if (seconds < 10) {seconds = "0"+seconds;}
 		    
 		    return hours+':'+minutes+':'+seconds;
+		}
+		
+		function version_selected(qid)
+		{
+			var		version = $("#versions")[0].value;
+			var		url = qid;
+			
+			url += "?version=" + version;
+			
+			window.location.href = url;			
 		}
 		
 		</script>

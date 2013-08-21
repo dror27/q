@@ -366,9 +366,10 @@ try
 	<% if ( request.getParameter("edit") == null ) { %>
 	<div class="button_div">
 		<select id="period" name="period">
+			<option value="0">lease period ...</option>
 			<option value="1">Blinker - 60s</option>
 			<option value="10">Be Back Soon - 10m</option>
-			<option value="60" selected>Meet You Here - 1h</option>
+			<option value="60" >Meet You Here - 1h</option>
 			<option value="480">Working Shifts - 8h</option>
 			<option value="1440">Call It A Day - 1d</option>
 		</select>

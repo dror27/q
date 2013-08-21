@@ -51,7 +51,15 @@
 
 
 [ ] cache smaller versions of large images?
+[ ] cache image size for use with html rendering process (without need to reload image on render)
 [ ] return 'last modified' on q and image pages to prevent reload
+
+[ ] attachment types other then image
+[ ] solve visual glitch that causes loaded (large) images to show up as huge initially on computer browser (before being resized)
+
+[ ] password protection option?
+[ ] longer tags against email
+
 
 
 -- api ---

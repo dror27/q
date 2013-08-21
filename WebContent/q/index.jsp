@@ -1,4 +1,4 @@
-<%@page import="com.nightox.q.logic.LeaseManager"%><%@page import="java.text.DecimalFormat"%><%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringEscapeUtils"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
+<%@page import="java.io.InputStream"%><%@page import="com.nightox.q.logic.LeaseManager"%><%@page import="java.text.DecimalFormat"%><%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringEscapeUtils"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
 
 final Log			log = LogFactory.getLog(this.getClass());
 
@@ -135,10 +135,21 @@ try
 			// must have upload field
 			if ( items.containsKey("upload") )
 			{
+				// extract info
 				String				text = items.get("text").getString("UTF-8").trim();
+				InputStream			fileInputStream = null;
+				String				fileContentType = null;
+				if ( items.containsKey("file") 
+						&& !StringUtils.isEmpty(items.get("file").getContentType()) 
+						&& items.get("file").getSize() > 0 )
+				{
+					fileInputStream = items.get("file").getInputStream();
+					fileContentType = items.get("file").getContentType();
+				}
+				boolean				hasContent = (text.length() > 0) || (fileInputStream != null) || (q.getContentType() != null);
 				
 				// lease
-				if ( (text.length() > 0) && (leaseManager.isLeaseOwner(q, device) || leaseManager.lease(q, device, period)) )
+				if ( hasContent && (leaseManager.isLeaseOwner(q, device) || leaseManager.lease(q, device, period)) )
 				{
 					// process
 					if ( !items.containsKey("edit") )
@@ -149,8 +160,8 @@ try
 								&& !StringUtils.isEmpty(items.get("file").getContentType()) 
 								&& items.get("file").getSize() > 0 )
 					{
-						q.setBinaryData(items.get("file").getInputStream());
-						q.setContentType(items.get("file").getContentType());
+						q.setBinaryData(fileInputStream);
+						q.setContentType(fileContentType);
 					}
 				}
 			}

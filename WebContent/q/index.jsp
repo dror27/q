@@ -438,10 +438,13 @@ try
 
 	<div id="data" class="data">
 		<% if ( request.getParameter("source") != null ) { 
-			if ( Factory.getServices().getHtmlRenderer().getImgRenderer().isImageQ(q) )
+			if ( Factory.getServices().getHtmlRenderer().getImgRenderer().canRender(q) )
 			{
 				DecimalFormat		format = new DecimalFormat();
-				%><pre>[Image: <%=q.getContentType()%>, <%=format.format(q.getBinaryData().length)%> bytes]</pre><%	
+				String				type = "File";
+				if ( ImgRenderer.isImageContentType(q.getContentType()) )
+					type = "Image";
+				%><pre>[<%=type%>: <%=q.getContentType()%>, <%=format.format(q.getBinaryData().length)%> bytes]</pre><%	
 			}
 			%><pre><%=q.getTextData()%></pre><%
 			

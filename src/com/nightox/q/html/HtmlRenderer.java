@@ -20,7 +20,7 @@ public class HtmlRenderer {
 		StringBuilder			sb = new StringBuilder();
 		
 		// has image?
-		if ( imgRenderer.isImageQ(q) )
+		if ( imgRenderer.canRender(q) )
 		{
 			sb.append(imgRenderer.renderHtml(q));
 			sb.append("\n");

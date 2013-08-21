@@ -1,4 +1,4 @@
-<%@page import="org.hibernate.Criteria"%><%@page import="java.text.SimpleDateFormat"%><%@page import="java.text.DateFormat"%><%@page import="org.hibernate.criterion.Order"%><%@page import="java.util.Date"%><%@page import="org.hibernate.criterion.Restrictions"%><%@page import="java.io.InputStream"%><%@page import="com.nightox.q.logic.LeaseManager"%><%@page import="java.text.DecimalFormat"%><%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringEscapeUtils"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
+<%@page import="com.nightox.q.html.ImgRenderer"%><%@page import="com.sun.tools.internal.ws.processor.model.Request"%><%@page import="org.hibernate.criterion.Projections"%><%@page import="org.hibernate.criterion.Projection"%><%@page import="org.hibernate.Criteria"%><%@page import="java.text.SimpleDateFormat"%><%@page import="java.text.DateFormat"%><%@page import="org.hibernate.criterion.Order"%><%@page import="java.util.Date"%><%@page import="org.hibernate.criterion.Restrictions"%><%@page import="java.io.InputStream"%><%@page import="com.nightox.q.logic.LeaseManager"%><%@page import="java.text.DecimalFormat"%><%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringEscapeUtils"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
 
 final Log			log = LogFactory.getLog(this.getClass());
 
@@ -12,6 +12,7 @@ final String		cdnUrl = Factory.getConfProperty("html.cdnUrl");
 final boolean		adsense = false;
 
 int					version = (request.getParameter("version") != null) ? Integer.parseInt(request.getParameter("version")) : 0;
+int					versionCount = 0;
 
 // first thing first ... we must have a device cookie 
 String		device = null;
@@ -36,6 +37,7 @@ try
 	// next we was to establish get q we are working on
 	String				qid = request.getPathInfo().replace("/", "");
 	Q					q = null;
+	Q					q0 = null;
 	if ( Factory.getServices().getqManager().isValidQ(qid) )
 	{
 		// fetch version?
@@ -50,18 +52,27 @@ try
 		}
 		
 		// fetch?
-		if ( q == null )
-		{
-			q = (Q)Database.getSession().createCriteria(Q.class)
+		q0 = (Q)Database.getSession().createCriteria(Q.class)
 					.add(Restrictions.eq("q", qid))
 					.add(Restrictions.isNull("version"))
 					.uniqueResult();
-		}			
+		if ( q == null )
+			q = q0;
 		
 		if ( q == null )
 		{
 			q = new Q(qid);
 			q.save();
+			q0 = q;
+		}
+		else
+		{
+			versionCount = ((Integer)Database.getSession().createCriteria(Q.class)
+					.add(Restrictions.eq("q", qid))
+					.add(Restrictions.isNotNull("dataType"))
+					.setProjection(Projections.rowCount())
+					.uniqueResult()).intValue();
+
 		}
 	}
 
@@ -170,6 +181,10 @@ try
 					fileContentType = items.get("file").getContentType();
 				}
 				boolean				hasContent = (text.length() > 0) || (fileInputStream != null) || (q.getContentType() != null);
+				/*
+				if ( fileContentType != null && !ImgRenderer.isImageContentType(fileContentType) )
+					hasContent = false;
+				*/
 				
 				// lease
 				if ( hasContent && (leaseManager.isLeaseOwner(q, device) || leaseManager.lease(q, device, period)) )
@@ -295,14 +310,14 @@ try
         div.data_img img {
         }
         div.data_varsize {
-        	display: inline;
+        	//display: inline;
         	overflow: hidden;
-        	white-space: nowrap;
+        	//white-space: nowrap;
         }
         div.data_varsize p {
-        	display: inline;
+        	//display: inline;
         	overflow: hidden;
-        	white-space: nowrap;
+        	//white-space: nowrap;
         }
         </style>
     </head>
@@ -321,8 +336,15 @@ try
 		<a title="back" href="<%=q.getQ()%>"><img src="<%=cdnUrl%>img/icons/glyphish/113-navigation-mirror.png"/></a>
 		<% } %>
 		<a title="attach" href="javascript:toggle_elem('#file_div')"><img id="file_enable" src="<%=cdnUrl%>img/icons/glyphish/68-paperclip.png"/></a>
+		<% if ( versionCount > 1 ) { %>
+		<a title="inspect" href="#" x-lock="0" onclick="toggle_elem('#ctrl2'); return false"><img src="<%=cdnUrl%>img/icons/glyphish/12-eye.png"/></a>
+		<% }  %>
 		<a title="print" href="<%=rootPath%>" target="_blank" style="float:right"><img src="<%=cdnUrl%>img/icons/glyphish/10-medical.png"/></a>
 	</div>
+
+	<% if ( versionCount > 1 ) { %>
+		<%=addCtrl2(request, q, qid, version, cdnUrl, false) %>
+	<% } %>
 
 	<div class="data">
 	<form method="post" enctype="multipart/form-data" action="<%=q.getQ()%>" acceptcharset="UTF-8">
@@ -336,7 +358,7 @@ try
 	<div class="button_div" id="file_div" style="display:none">
 		<input id="file" name="file" type="file" placeholder="upload image here">
 	</div>
-	<textarea id="text" name="text" cols="33" rows="6" placeholder="type text here"><%
+	<textarea id="text" name="text" cols="27" rows="6" placeholder="type text here"><%
 	if ( q.getTextData() != null && request.getParameter("edit") != null ) {
 		%><%=StringEscapeUtils.escapeHtml(q.getTextData())%><%
 	}
@@ -362,7 +384,7 @@ try
 		<% if ( request.getParameter("source") != null || request.getParameter("lease") != null ) { %>
 			<a title="back" href="<%=backUrl%>"><img src="<%=cdnUrl%>img/icons/glyphish/113-navigation-mirror.png"/></a>
 		<% } else { %>
-			<% if ( !leaseManager.isLeased(q) || leaseManager.isLeaseOwner(q, device) ) { %>
+			<% if ( !leaseManager.isLeased(q0) || leaseManager.isLeaseOwner(q0, device) ) { %>
 				<a title="replace" href="<%=q.getQ()%>?replace"><img src="<%=cdnUrl%>img/icons/glyphish/08-chat.png"/></a>	
 				<a title="edit" href="<%=q.getQ()%>?edit"><img src="<%=cdnUrl%>img/icons/glyphish/19-gear.png"/></a>
 				<a title="clear" href="<%=q.getQ()%>?clear" onclick="return window.confirm('clear?')"><img src="<%=cdnUrl%>img/icons/glyphish/22-skull-n-bones.png"/></a>
@@ -378,7 +400,7 @@ try
 		<%
 		if ( request.getParameter("source") == null && request.getParameter("lease") == null)
 		{
-			int			secs = leaseManager.secondsToLeaseEnd(q);
+			int			secs = leaseManager.secondsToLeaseEnd(q0);
 			if ( secs > 0 )
 			{
 				%>
@@ -393,63 +415,7 @@ try
 	</div>
 	
 	<% if ( request.getParameter("source") == null && request.getParameter("lease") == null ) { %>
-	<div class="ctrl ctrl2" id="ctrl2" <%=((request.getParameter("version") == null) ? "style=\"display:none\"" : "")%>>
-		<%
-			String		sourceUrl = q.getQ() + "?source";
-			if ( request.getParameter("version") != null )
-				sourceUrl += "&version=" + request.getParameter("version");
-		%>
-		<a title="source" href="<%=sourceUrl%>"><img src="<%=cdnUrl%>img/icons/glyphish/179-notepad.png"/></a>
-		
-		<%
-			List<Q>		past = Database.getSession().createCriteria(Q.class)
-											.add(Restrictions.eq("q", qid))
-											.add(Restrictions.isNotNull("version"))
-											.add(Restrictions.isNotNull("dataType"))
-											.addOrder(Order.desc("version"))
-											.setMaxResults(100)
-											.list();
-			if ( past != null && !past.isEmpty() )
-			{
-				%>
-				<select id="versions" onchange="version_selected('<%=qid%>')">
-					<option value="0"><%=((request.getParameter("version") != null) ? "current version" : "past versions ...")%></option>
-					<% 
-						DateFormat		df = new SimpleDateFormat("dd/MM");
-						int				limit = 18;
-						for ( Q q1 : past ) 
-						{
-							String		preview = "";
-							if ( q1.getLeaseStartedAt() != null )
-								preview += " " + df.format(q1.getLeaseStartedAt());
-							
-							String		text = q1.getTextData();
-							if ( StringUtils.isEmpty(text) && (q1.getContentType() != null) )
-								text = "[" + q1.getContentType() + "]";
-							
-							if ( !StringUtils.isEmpty(text) )
-							{
-								if ( text.length() < limit )
-									preview += " " + text;
-								else
-									preview += " " + text.substring(0, limit - 4) + " ...";
-							}
-							if ( preview.length() == 0 )
-								preview += " " + q1.getVersion();
-							preview = preview.trim();
-							
-							String			selected = (version == q1.getVersion()) ? "selected" : "";
-							
-							%>
-							<option value="<%=q1.getVersion()%>" <%=selected%>><%=preview%></option>
-							<%
-						}
-					%>
-				</select>
-				<%				
-			}
-		%>
-	</div>
+		<%=addCtrl2(request, q, qid, version, cdnUrl, true) %>
 	<% } %>
 
 	<% if ( adsense ) { %>
@@ -597,48 +563,56 @@ try
 			{
 				// must have a data_varsize
 				var		varsize = $('#data_varsize');
+				var		data = $("#data");
 				if ( varsize == null || varsize.length == 0 )
 					return;
 				
-				// prepare
-				var		data = $("#data");
-				var		fontSize = parseInt(varsize.css("font-size"), 10);
-				var		orgFontSize = fontSize;
-				var		orgHtml = varsize.html();
-				var		maxFontSize = 80;
-				var		maxWidth = data.width();
-				
-				// loop until overflows or too big
-				var		modHtml = orgHtml.replace("</p>", "</p><br/>");
-				varsize.html(modHtml)
-				while ( fontSize < maxFontSize )
+				if ( is_auto_resize(varsize.text()) )
 				{
-					var		nextFontSize = Math.min(Math.floor(fontSize * 3 / 2), maxFontSize);
+					varsize.css("white-space", "nowrap");
+					varsize.css("display", "inline");
+					$("#data_varsize p").css("white-space", "nowrap");
+					$("#data_varsize p").css("display", "inline");
 					
-					varsize.css("font-size", nextFontSize + "px");
-					var		nextWidth = varsize.width();
-					if ( nextWidth > maxWidth )
-						break;
+					// prepare
+					var		fontSize = parseInt(varsize.css("font-size"), 10);
+					var		orgFontSize = fontSize;
+					var		orgHtml = varsize.html();
+					var		maxFontSize = 80;
+					var		maxWidth = data.width();
 					
-					fontSize = nextFontSize;
+					// loop until overflows or too big
+					var		modHtml = orgHtml.replace("</p>", "</p><br/>");
+					varsize.html(modHtml)
+					while ( fontSize < maxFontSize )
+					{
+						var		nextFontSize = Math.min(Math.floor(fontSize * 3 / 2), maxFontSize);
+						
+						varsize.css("font-size", nextFontSize + "px");
+						var		nextWidth = varsize.width();
+						if ( nextWidth > maxWidth )
+							break;
+						
+						fontSize = nextFontSize;
+					}
+					
+					// set font size we've settled on
+					varsize.html(orgHtml);
+					varsize.css("font-size", fontSize + "px");
+					if ( fontSize != orgFontSize )
+						varsize.css("line-height", 1.05);
+					
+					// reset inner paragraphs
+					var					paraSpacing = Math.floor(fontSize / 2);
+					$("#data_varsize p").css("display", "block");
+					$("#data_varsize p").css("margin", "0px 0px " + 0 + "px 0px");
+					$("#data_varsize p").css("padding", "0px 0px " + paraSpacing + "px 0px");
+					
+					// auto-center
+					if ( is_auto_center(varsize.html()) )
+						data.css("text-align", "center");
 				}
-				
-				// set font size we've settled on
-				varsize.html(orgHtml);
-				varsize.css("font-size", fontSize + "px");
-				if ( fontSize != orgFontSize )
-					varsize.css("line-height", 1.05);
-				
-				// reset inner paragraphs
-				var					paraSpacing = Math.floor(fontSize / 2);
-				$("#data_varsize p").css("display", "block");
-				$("#data_varsize p").css("margin", "0px 0px " + 0 + "px 0px");
-				$("#data_varsize p").css("padding", "0px 0px " + paraSpacing + "px 0px");
-				
-				// auto-center
-				if ( is_auto_center(varsize.html()) )
-					data.css("text-align", "center");
-				
+			
 				// auto rtl?
 				if ( is_auto_rtl(varsize.text()) )
 					data.css("direction", "rtl");
@@ -646,6 +620,25 @@ try
 			} catch (e)
 			{
 				
+			}
+		}
+		
+		function is_auto_resize(text)
+		{
+			var		limit = 30;
+			try
+			{
+				var		lines = text.split("\n");
+				for ( var n = 0 ; n < lines.length ; n++ )
+					if ( lines[n].length > limit )
+						return false;
+				
+				return true;
+				
+				
+			} catch (e)
+			{
+				return false;
 			}
 		}
 		
@@ -897,5 +890,70 @@ try
 finally
 {
 	sessionManager.popThreadSession();
+}
+%>
+
+<%!
+public String addCtrl2(HttpServletRequest request, Q q, String qid, int version, String cdnUrl, boolean showViewSource)
+{
+	StringBuilder		sb = new StringBuilder();
+
+	sb.append("<div class=\"ctrl ctrl2\" id=\"ctrl2\" " + ((request.getParameter("version") == null) ? "style=\"display:none\"" : "") + ">");
+
+	String		sourceUrl = q.getQ() + "?source";
+	if ( request.getParameter("version") != null )
+		sourceUrl += "&version=" + request.getParameter("version");
+	if ( showViewSource )
+		sb.append("<a title=\"source\" href=\"" + sourceUrl + "\"><img src=\"" + cdnUrl + "img/icons/glyphish/179-notepad.png\"/></a>");
+		
+	List<Q>		past = Database.getSession().createCriteria(Q.class)
+											.add(Restrictions.eq("q", qid))
+											.add(Restrictions.isNotNull("version"))
+											.add(Restrictions.isNotNull("dataType"))
+											.addOrder(Order.desc("version"))
+											.setMaxResults(100)
+											.list();
+	if ( past != null && !past.isEmpty() )
+	{
+		sb.append("<select id=\"versions\" onchange=\"version_selected('" + qid + "')\">");
+		if ( (request.getParameter("version") != null) )
+			sb.append("<option value=\"0\">current version</option>");
+		else
+			sb.append("<option value=\"0\">past versions</option>");
+
+		DateFormat		df = new SimpleDateFormat("dd/MM");
+		int				limit = 18;
+		for ( Q q1 : past ) 
+		{
+			String		preview = "";
+			if ( q1.getLeaseStartedAt() != null )
+				preview += " " + df.format(q1.getLeaseStartedAt());
+			
+			String		text = q1.getTextData();
+			if ( StringUtils.isEmpty(text) && (q1.getContentType() != null) )
+				text = "[" + q1.getContentType() + "]";
+			
+			if ( !StringUtils.isEmpty(text) )
+			{
+				if ( text.length() < limit )
+					preview += " " + text;
+				else
+					preview += " " + text.substring(0, limit - 4) + " ...";
+			}
+			if ( preview.length() == 0 )
+				preview += " " + q1.getVersion();
+			preview = preview.trim();
+			
+			String			selected = (version == q1.getVersion()) ? "selected" : "";
+			
+			sb.append(String.format("<option value=\"%d\" %s>%s</option>", q1.getVersion(), selected, preview));
+		}
+		
+		sb.append("</select>");
+	}
+	
+	sb.append("</div>");
+	
+	return sb.toString();
 }
 %>

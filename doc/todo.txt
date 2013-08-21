@@ -35,9 +35,17 @@
 [x] clear confirmation
 [x] ignore empty posts
 
+[x] past versions source display
+[x] disable editing/clearing/replacing of past versions
+
+[x] past versions on upload form
+[x] lease should reflect top q only 
+
 
 -- html/design --
-[ ] !!! line folding is broken
+
+[/] !!! line folding is broken
+
 
 [ ] map of q around?
 
@@ -62,10 +70,7 @@
 [ ] password protection option?
 [ ] longer tags against email
 
-[ ] past versions on upload form
 [ ] bring past version using ajax?
-[ ] past versions source display
-[ ] disable editing/clearing/replacing of past versions
 
 -- api ---
 [ ] simple api based on the stndard jsp/servlet

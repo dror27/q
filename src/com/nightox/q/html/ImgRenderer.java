@@ -3,10 +3,14 @@ package com.nightox.q.html;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
+
+import org.apache.commons.lang.StringUtils;
 
 import com.nightox.q.model.m.Q;
 
@@ -22,24 +26,52 @@ public class ImgRenderer {
 		imageContentTypes.add("image/tiff");
 	}
 	
+	public boolean canRender(Q q)
+	{
+		return !StringUtils.isEmpty(q.getContentType()) && (q.getBinaryData() != null);
+	}
+	
+	public static boolean isImageContentType(String contentType)
+	{
+		return contentType != null && imageContentTypes.contains(contentType);
+	}
+	
 	public boolean isImageQ(Q q)
 	{
-		return q.getContentType() != null && imageContentTypes.contains(q.getContentType());
+		return isImageContentType(q.getContentType());
 	}
 	
 	public String renderHtml(Q q)
 	{
-		Dimension		imageSize = getImageSize(q);
-		
-		String			widthAttr = "";
-		if ( imageSize != null && imageSize.width > 300 )
-			widthAttr = "width=\"100%\"";
-		
 		String			url = q.getQ() + "?image";
 		if ( q.getVersion() != null )
 			url += "&version=" + q.getVersion();
 		
-		return String.format("<div class=\"data_img\"><img x-width=\"0\" %s src=\"%s\"/></div>", widthAttr, url);
+		if ( isImageContentType(q.getContentType()) )
+		{
+			Dimension		imageSize = getImageSize(q);
+			
+			String			widthAttr = "";
+			if ( imageSize != null && imageSize.width > 300 )
+				widthAttr = "width=\"100%\"";
+			
+			return String.format("<div class=\"data_img\"><img x-width=\"0\" %s src=\"%s\"/></div>", widthAttr, url);
+		}
+		else
+		{
+			DecimalFormat		format = new DecimalFormat();
+			String				text = "";
+			
+			if ( q.getContentType() != null )
+				text += q.getContentType();
+			
+			if ( q.getBinaryData() != null )
+				text += " " + format.format(q.getBinaryData().length) + " bytes";
+	
+			text = text.trim();
+			
+			return String.format("<div class=\"data_other\"><a href=\"%s\"/>%s</a></div>" ,url, text);
+		}
 	}
 
 	public Dimension getImageSize(Q q) 

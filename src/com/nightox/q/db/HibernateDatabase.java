@@ -84,6 +84,7 @@ public class HibernateDatabase {
 			String		schema = toks[3];
 			
 			String		cmd = mysql + " --user=" + username + " --password=" + password + " --host=" + host + " " + schema;
+			System.out.println("cmd: " + cmd);
 			
 			try
 			{

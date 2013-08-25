@@ -102,10 +102,20 @@ try
 				border: 1px solid;
         	}
 
-	      html { height: 100% }
-	      body { height: 100%;  }
+	      	html { height: 100% }
+      		body { height: 100%; margin: 0; padding: 0 }
 
-			#map-canvas { height: 100% }
+		  	#map-canvas { height: 100% }
+		  
+		  	/*
+		  	div#query-div {
+		  			display: none;
+		  	}
+
+		  	div#results-div {
+		  			display: none;
+		  	}
+		  	*/
         </style>
         
         
@@ -123,7 +133,7 @@ try
     <body>
     
     	<!-- query form -->
-    	<p>
+    	<div id="query-div"/>
     	<form>
     		<table class="query">
     		
@@ -167,7 +177,7 @@ try
     			</tr>
     		</table>
     	</form>
-    	</p>
+    	</div>
     	
     	<%
     		// build criteria
@@ -223,7 +233,7 @@ try
     	%>
     	
     	<!-- results table -->
-    	<p>
+    	<div id="results-div">
     	<table class="results">
     		<tr>
     			<th/>
@@ -240,7 +250,7 @@ try
     				</td>
     				
     				<td>
-    					<a target="_blank" href="<%=rootPath%>q/<%=q.getQ()%>"><%=q.getQ()%></a>
+    					<a target="_blank" href="q/<%=q.getQ()%>"><%=q.getQ()%></a>
     				</td>
     				
     				<td>
@@ -260,7 +270,7 @@ try
     				
     				<td>
     					<% if ( !StringUtils.isEmpty(q.getContentType()) ) { %>
-    						<a target="_blank" href="<%=rootPath%>q/<%=q.getQ()%>?image"/><%=q.getContentType()%></a>
+    						<a target="_blank" href="q/<%=q.getQ()%>?image"/><%=q.getContentType()%></a>
     					<% } %>
     				</td>
     				
@@ -305,7 +315,7 @@ try
     			</tr>
     		<% } %>
     	</table>
-    	</p>
+    	</div>
     
     	<% if ( latitude_min != Double.MAX_VALUE && longitude_min != Double.MAX_VALUE ) { %>
     		<div id="map-canvas"/>
@@ -357,7 +367,7 @@ try
 			        });
 	
 			        google.maps.event.addListener(marker, "click", function() {
-			            window.open("<%=rootPath%>q/<%=q.getQ()%>", "_blank");
+			            window.open("q/<%=q.getQ()%>", "_blank");
 			        });
 			        
 			        marker.setMap(map);

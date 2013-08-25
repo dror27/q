@@ -42,6 +42,7 @@
 [x] lease should reflect top q only 
 
 --- now ---
+[ ] admin access should not destroy position
 [ ] admin webapp
 [ ] track access/mods to q via database (? / rather then through access logs)
 [ ] extended code q making page - standard link + setup for: NxM, caption, center image

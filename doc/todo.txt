@@ -44,6 +44,7 @@
 --- now ---
 [ ] admin webapp
 [ ] track access/mods to q via database (? / rather then through access logs)
+[ ] extended code q making page - standard link + setup for: NxM, caption, center image
 
 -- html/design --
 
@@ -122,6 +123,7 @@
 [ ] new (hidden?) domain?
 [ ] bucket storage?
 [ ] add database indexes
+[ ] admin acess only w/ password
 
 
 --- investigate ---

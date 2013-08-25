@@ -59,7 +59,8 @@ public class HtmlRenderer {
 		try {
 			Markdown4jProcessor		mdp =  new Markdown4jProcessor();
 			
-			text = mdp.process(text);				
+			if ( !StringUtils.isEmpty(text) )
+				text = mdp.process(text);				
 			
 		} catch (IOException e) {
 			e.printStackTrace();

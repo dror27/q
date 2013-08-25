@@ -63,6 +63,7 @@ try
 		{
 			q = new Q(qid);
 			q.save();
+			q.setDataType("post");
 			q0 = q;
 		}
 		else
@@ -330,7 +331,7 @@ try
 
 
 
-	if ( q.getDataType() == null || request.getParameter("replace") != null || request.getParameter("edit") != null ) { %>
+	if ( isEmpty(q) || request.getParameter("replace") != null || request.getParameter("edit") != null ) { %>
 	<div class="ctrl">
 		<% if ( request.getParameter("replace") != null || request.getParameter("edit") != null ) { %>
 		<a title="back" href="<%=q.getQ()%>"><img src="<%=cdnUrl%>img/icons/glyphish/113-navigation-mirror.png"/></a>
@@ -959,5 +960,16 @@ public String addCtrl2(HttpServletRequest request, Q q, String qid, int version,
 	sb.append("</div>");
 	
 	return sb.toString();
+}
+
+public boolean isEmpty(Q q)
+{
+	if ( q.getDataType() == null )
+		return true;
+	
+	boolean		b1 = StringUtils.isEmpty(q.getTextData());
+	boolean		b2 = StringUtils.isEmpty(q.getContentType());
+	
+	return b1 & b2; 
 }
 %>

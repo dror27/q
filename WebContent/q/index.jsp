@@ -69,7 +69,7 @@ try
 		{
 			versionCount = ((Integer)Database.getSession().createCriteria(Q.class)
 					.add(Restrictions.eq("q", qid))
-					.add(Restrictions.isNotNull("dataType"))
+					.add(Restrictions.eq("dataType", "post"))
 					.setProjection(Projections.rowCount())
 					.uniqueResult()).intValue();
 
@@ -913,7 +913,7 @@ public String addCtrl2(HttpServletRequest request, Q q, String qid, int version,
 	List<Q>		past = Database.getSession().createCriteria(Q.class)
 											.add(Restrictions.eq("q", qid))
 											.add(Restrictions.isNotNull("version"))
-											.add(Restrictions.isNotNull("dataType"))
+											.add(Restrictions.eq("dataType", "post"))
 											.addOrder(Order.desc("version"))
 											.setMaxResults(100)
 											.list();

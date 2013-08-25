@@ -41,6 +41,9 @@
 [x] past versions on upload form
 [x] lease should reflect top q only 
 
+--- now ---
+[ ] admin webapp
+[ ] track access/mods to q via database (? / rather then through access logs)
 
 -- html/design --
 
@@ -72,6 +75,7 @@
 
 [ ] bring past version using ajax?
 
+
 -- api ---
 [ ] simple api based on the stndard jsp/servlet
 [ ] param for output format (html/json)
@@ -98,6 +102,8 @@
 [ ] manager versions (prev) of content on page
 [/] AdSense
 [ ] Paypal/lease
+[ ] coupons for all (manage as q pages) - store data as json?
+[ ] permanent lease hook (coupons)
 
 --- management ---
 [ ] write management page (basic)

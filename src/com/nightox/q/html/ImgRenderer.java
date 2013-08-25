@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -17,6 +16,7 @@ import com.nightox.q.model.m.Q;
 public class ImgRenderer {
 
 	static private Set<String>		imageContentTypes = new LinkedHashSet<String>();
+	private boolean					useImageSize = false;
 	
 	static {
 		imageContentTypes.add("image/jpg");
@@ -52,7 +52,7 @@ public class ImgRenderer {
 			Dimension		imageSize = getImageSize(q);
 			
 			String			widthAttr = "";
-			if ( imageSize != null && imageSize.width > 300 )
+			if ( imageSize == null || imageSize.width > 300 )
 				widthAttr = "width=\"100%\"";
 			
 			return String.format("<div class=\"data_img\"><img x-width=\"0\" %s src=\"%s\"/></div>", widthAttr, url);
@@ -76,6 +76,9 @@ public class ImgRenderer {
 
 	public Dimension getImageSize(Q q) 
 	{
+		if ( !isUseImageSize() )
+			return null;
+		
 		if ( !isImageQ(q) )
 			return null;
 		byte[]		bytes = q.getBinaryData();
@@ -97,5 +100,13 @@ public class ImgRenderer {
 		{
 			return null;
 		}
+	}
+
+	public boolean isUseImageSize() {
+		return useImageSize;
+	}
+
+	public void setUseImageSize(boolean useImageSize) {
+		this.useImageSize = useImageSize;
 	}
 }

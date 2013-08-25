@@ -37,7 +37,7 @@ CREATE TABLE `qs` (
   `version` integer,
   `lease_holder` char(64),
   `lease_started_at` DATETIME,
-  `lease_ends_at` DATETIME 
+  `lease_ends_at` DATETIME, 
   
   PRIMARY KEY  (`id`)
   

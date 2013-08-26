@@ -1,15 +1,21 @@
 <%@page import="com.sun.xml.internal.bind.v2.runtime.reflect.Lister"%>
 <%@page import="com.nightox.q.servlets.FileUploadProgressListener"%><%@page import="com.nightox.q.utils.TimeUtils"%><%@page import="com.nightox.q.utils.DateUtils"%><%@page import="com.google.zxing.client.result.URLTOResultParser"%><%@page import="com.nightox.q.html.ImgRenderer"%><%@page import="org.hibernate.criterion.Projections"%><%@page import="org.hibernate.criterion.Projection"%><%@page import="org.hibernate.Criteria"%><%@page import="java.text.SimpleDateFormat"%><%@page import="java.text.DateFormat"%><%@page import="org.hibernate.criterion.Order"%><%@page import="java.util.Date"%><%@page import="org.hibernate.criterion.Restrictions"%><%@page import="java.io.InputStream"%><%@page import="com.nightox.q.logic.LeaseManager"%><%@page import="java.text.DecimalFormat"%><%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringEscapeUtils"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
 
+final Log			log = LogFactory.getLog(this.getClass());
+
 // reporting progress
 if ( request.getParameter("progress") != null )
 {
 	String						progress = "";
 	
 	FileUploadProgressListener	listener = (FileUploadProgressListener)request.getSession().getAttribute("_progress");
+	log.info("listener: " + listener);
+	
 	if ( listener != null && listener.getContentLength() != 0 )
 		progress = (int)(listener.getBytesRead() * 100 / listener.getContentLength()) + "% uploaded";
 		
+	log.info("progress: " + progress);
+	
 	response.getWriter().print(progress);
 	
 	return;
@@ -17,7 +23,6 @@ if ( request.getParameter("progress") != null )
 
 
 
-final Log			log = LogFactory.getLog(this.getClass());
 
 // some accessors
 final LeaseManager	leaseManager = Factory.getServices().getLeaseManager();

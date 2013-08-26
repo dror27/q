@@ -1,7 +1,7 @@
 <%@page import="com.nightox.q.servlets.FileUploadProgressListener"%><%@page import="com.nightox.q.utils.TimeUtils"%><%@page import="com.nightox.q.utils.DateUtils"%><%@page import="com.google.zxing.client.result.URLTOResultParser"%><%@page import="com.nightox.q.html.ImgRenderer"%><%@page import="org.hibernate.criterion.Projections"%><%@page import="org.hibernate.criterion.Projection"%><%@page import="org.hibernate.Criteria"%><%@page import="java.text.SimpleDateFormat"%><%@page import="java.text.DateFormat"%><%@page import="org.hibernate.criterion.Order"%><%@page import="java.util.Date"%><%@page import="org.hibernate.criterion.Restrictions"%><%@page import="java.io.InputStream"%><%@page import="com.nightox.q.logic.LeaseManager"%><%@page import="java.text.DecimalFormat"%><%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringEscapeUtils"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
 
 final Log			log = LogFactory.getLog(this.getClass());
-log.info("starting");
+log.debug("starting: " + request.getPathInfo() + ", " + request.getQueryString());
 
 // reporting progress
 if ( request.getParameter("progress") != null )
@@ -9,12 +9,12 @@ if ( request.getParameter("progress") != null )
 	String						progress = "";
 	
 	FileUploadProgressListener	listener = (FileUploadProgressListener)request.getSession().getAttribute("_progress");
-	log.info("listener: " + listener);
+	log.debug("listener: " + listener);
 	
 	if ( listener != null && listener.getContentLength() != 0 )
 		progress = (int)(listener.getBytesRead() * 100 / listener.getContentLength()) + "% uploaded";
 		
-	log.info("progress: " + progress);
+	log.debug("progress: " + progress);
 	
 	response.getWriter().print(progress);
 	
@@ -166,35 +166,35 @@ try
 		try
 		{
 			// starting upload
-			log.info("starting upload");
+			log.debug("starting upload");
 			
 			// Create a factory for disk-based file items
 			DiskFileItemFactory factory = new DiskFileItemFactory();
 			factory.setSizeThreshold(16777216);
-			log.info("disk-based factory created");
+			log.debug("disk-based factory created");
 	
 			// Configure a repository (to ensure a secure temp location is used)
 			ServletContext servletContext = this.getServletConfig().getServletContext();
 			File repository = (File) servletContext.getAttribute("javax.servlet.context.tempdir");
 			factory.setRepository(repository);
-			log.info("repository created");
+			log.debug("repository created");
 	
 			// Create a new file upload handler
 			ServletFileUpload 				upload = new ServletFileUpload(factory);
 			FileUploadProgressListener		listener = new FileUploadProgressListener();
 			upload.setProgressListener(listener);
 			request.getSession().setAttribute("_progress", listener);
-			log.info("upload handler created");
+			log.debug("upload handler created");
 	
 			// Parse the request
 			Map<String, FileItem>	items = new LinkedHashMap<String, FileItem>();
 			for ( FileItem item : upload.parseRequest(request) )
 			{
-				log.info("item: " + item.getFieldName());
+				log.debug("item: " + item.getFieldName());
 				items.put(item.getFieldName(), item);
 			}
 			
-			//TimeUtils.delay(3000);
+			TimeUtils.delay(3000);
 			
 			// get period
 			int						period = 0; // default
@@ -252,11 +252,11 @@ try
 			log.error("upload failed", e);
 		}
 
-		//TimeUtils.delay(3000);
+		TimeUtils.delay(3000);
 
 		// redirect to view page
 		request.getSession().setAttribute("_progress", null);
-		log.info("redirecting");
+		log.debug("redirecting");
 		response.sendRedirect(q.getQ());
 		return;
 	}
@@ -919,24 +919,63 @@ try
 		
 		function form_submit()
 		{
+			/*
 			try
 			{
 				var			file = $("#file")[0].value;
 			
 				if ( file != null && file.length != 0 )
 				{
-					$("#form")[0].target = "hidden-form";
-					update_progress();	
+					console.log("file upload");
+					
+					var		url = '<%=qid%>';
+					var		data = $("#form").serialize();
+					
+					 $.ajax({
+					   type: 'POST',
+					   url: url,
+					   data: data,
+					   context: $("body"),
+					   beforeSend: function(XMLHttpRequest)
+					   {
+					     //Upload progress
+					     XMLHttpRequest.upload.addEventListener("progress", function(evt){
+					       if (evt.lengthComputable) {  
+					         var percentComplete = evt.loaded / evt.total;
+					         console.log("upload progress: " + percentComplete);
+					       }
+					     }, false); 
+					     //Download progress
+					     XMLHttpRequest.addEventListener("progress", function(evt){
+					       if (evt.lengthComputable) {  
+					         var percentComplete = evt.loaded / evt.total;
+					         console.log("download progress: " + percentComplete);
+					       }
+					     }, false);
+					     XMLHttpRequest.onprogress = function(evt) { console.log("on progress");};
+					     XMLHttpRequest.upload.onprogress = function(evt) { console.log("upload on progress");};
+					   },
+					   success: function(data){
+						   	console.log("done");
+							window.location.href = url;		
+					   }
+					 });
+					
+					update_progress();
+					
+					return false;
 				}
 					
 			} catch (e) {
 				
 			}
+			*/
 			
 			return true;
 		}
 		
 		var form_submitted = null;
+		
 		
 		function update_progress()
 		{
@@ -950,13 +989,7 @@ try
 				window.setTimeout(update_progress, 500);
 			});
 		}
-		
-		function iframe_loaded()
-		{
-			if ( form_submitted != null )
-				window.location.href = '<%=qid%>';			
-		}
-		
+				
 		</script>
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
@@ -970,8 +1003,6 @@ try
 		  ga('send', 'pageview');
 		
 		</script>
-		
-		<IFRAME style="display:none" name="hidden-form" onload="javascript:iframe_loaded()"></IFRAME> 
     </body>
 </html><%
 	

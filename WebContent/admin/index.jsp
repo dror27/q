@@ -250,7 +250,7 @@ try
     				</td>
     				
     				<td>
-    					<a target="_blank" href="q/<%=q.getQ()%>"><%=q.getQ()%></a>
+    					<a target="_blank" href="qa/<%=q.getQ()%>"><%=q.getQ()%></a>
     				</td>
     				
     				<td>
@@ -270,7 +270,7 @@ try
     				
     				<td>
     					<% if ( !StringUtils.isEmpty(q.getContentType()) ) { %>
-    						<a target="_blank" href="q/<%=q.getQ()%>?image"/><%=q.getContentType()%></a>
+    						<a target="_blank" href="qa/<%=q.getQ()%>?image"/><%=q.getContentType()%></a>
     					<% } %>
     				</td>
     				
@@ -367,7 +367,7 @@ try
 			        });
 	
 			        google.maps.event.addListener(marker, "click", function() {
-			            window.open("q/<%=q.getQ()%>", "_blank");
+			            window.open("qa/<%=q.getQ()%>", "_blank");
 			        });
 			        
 			        marker.setMap(map);

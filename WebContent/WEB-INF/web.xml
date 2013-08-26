@@ -19,6 +19,6 @@
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>QJsp</servlet-name>
-    <url-pattern>/admin/q/*</url-pattern>
+    <url-pattern>/admin/qa/*</url-pattern>
   </servlet-mapping>
 </web-app>

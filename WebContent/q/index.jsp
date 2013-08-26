@@ -1,4 +1,21 @@
+<%@page import="com.sun.xml.internal.bind.v2.runtime.reflect.Lister"%>
 <%@page import="com.nightox.q.servlets.FileUploadProgressListener"%><%@page import="com.nightox.q.utils.TimeUtils"%><%@page import="com.nightox.q.utils.DateUtils"%><%@page import="com.google.zxing.client.result.URLTOResultParser"%><%@page import="com.nightox.q.html.ImgRenderer"%><%@page import="org.hibernate.criterion.Projections"%><%@page import="org.hibernate.criterion.Projection"%><%@page import="org.hibernate.Criteria"%><%@page import="java.text.SimpleDateFormat"%><%@page import="java.text.DateFormat"%><%@page import="org.hibernate.criterion.Order"%><%@page import="java.util.Date"%><%@page import="org.hibernate.criterion.Restrictions"%><%@page import="java.io.InputStream"%><%@page import="com.nightox.q.logic.LeaseManager"%><%@page import="java.text.DecimalFormat"%><%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringEscapeUtils"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
+
+// reporting progress
+if ( request.getParameter("progress") != null )
+{
+	String						progress = "";
+	
+	FileUploadProgressListener	listener = (FileUploadProgressListener)request.getSession().getAttribute("_progress");
+	if ( listener != null && listener.getContentLength() != 0 )
+		progress = (int)(listener.getBytesRead() * 100 / listener.getContentLength()) + "% uploaded";
+		
+	response.getWriter().print(progress);
+	
+	return;
+}			
+
+
 
 final Log			log = LogFactory.getLog(this.getClass());
 
@@ -138,21 +155,6 @@ try
 		return;
 	}			
 
-	// reporting progress
-	if ( request.getParameter("progress") != null )
-	{
-		long		bytesRead = FileUploadProgressListener.getBytesRead(request.getSession());
-		long 		contentBytes = FileUploadProgressListener.getContentLength(request.getSession());
-
-		String		progress = "";
-		if ( contentBytes != 0 )
-			progress = (int)(bytesRead * 100 / contentBytes) + "% uploaded";
-			
-		response.getWriter().print(progress);
-		
-		return;
-	}			
-	
 	// uploading?
 	if ( ServletFileUpload.isMultipartContent(request) && (version <= 0) )
 	{
@@ -173,8 +175,10 @@ try
 			log.info("repository created");
 	
 			// Create a new file upload handler
-			ServletFileUpload upload = new ServletFileUpload(factory);
-			upload.setProgressListener(new FileUploadProgressListener(request.getSession()));
+			ServletFileUpload 				upload = new ServletFileUpload(factory);
+			FileUploadProgressListener		listener = new FileUploadProgressListener();
+			upload.setProgressListener(listener);
+			request.getSession().setAttribute("_progress", listener);
 			log.info("upload handler created");
 	
 			// Parse the request
@@ -246,6 +250,7 @@ try
 		//TimeUtils.delay(3000);
 
 		// redirect to view page
+		request.getSession().setAttribute("_progress", null);
 		log.info("redirecting");
 		response.sendRedirect(q.getQ());
 		return;

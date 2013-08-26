@@ -1,4 +1,4 @@
-<%@page import="com.google.zxing.client.result.URLTOResultParser"%><%@page import="com.nightox.q.html.ImgRenderer"%><%@page import="org.hibernate.criterion.Projections"%><%@page import="org.hibernate.criterion.Projection"%><%@page import="org.hibernate.Criteria"%><%@page import="java.text.SimpleDateFormat"%><%@page import="java.text.DateFormat"%><%@page import="org.hibernate.criterion.Order"%><%@page import="java.util.Date"%><%@page import="org.hibernate.criterion.Restrictions"%><%@page import="java.io.InputStream"%><%@page import="com.nightox.q.logic.LeaseManager"%><%@page import="java.text.DecimalFormat"%><%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringEscapeUtils"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
+<%@page import="com.nightox.q.servlets.FileUploadProgressListener"%><%@page import="com.nightox.q.utils.TimeUtils"%><%@page import="com.nightox.q.utils.DateUtils"%><%@page import="com.google.zxing.client.result.URLTOResultParser"%><%@page import="com.nightox.q.html.ImgRenderer"%><%@page import="org.hibernate.criterion.Projections"%><%@page import="org.hibernate.criterion.Projection"%><%@page import="org.hibernate.Criteria"%><%@page import="java.text.SimpleDateFormat"%><%@page import="java.text.DateFormat"%><%@page import="org.hibernate.criterion.Order"%><%@page import="java.util.Date"%><%@page import="org.hibernate.criterion.Restrictions"%><%@page import="java.io.InputStream"%><%@page import="com.nightox.q.logic.LeaseManager"%><%@page import="java.text.DecimalFormat"%><%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringEscapeUtils"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
 
 final Log			log = LogFactory.getLog(this.getClass());
 
@@ -26,7 +26,7 @@ if ( request.getCookies() != null )
 if ( device == null )
 	device = Factory.getServices().getqManager().newQ();
 Cookie				c = new Cookie(COOKIE_NAME, device);
-c.setMaxAge(Integer.MIN_VALUE);
+c.setMaxAge(Integer.MAX_VALUE);
 response.addCookie(c);
 
 // open database session
@@ -137,6 +137,21 @@ try
 		// set empty response back
 		return;
 	}			
+
+	// reporting progress
+	if ( request.getParameter("progress") != null )
+	{
+		long		bytesRead = FileUploadProgressListener.getBytesRead(request.getSession());
+		long 		contentBytes = FileUploadProgressListener.getContentLength(request.getSession());
+
+		String		progress = "";
+		if ( contentBytes != 0 )
+			progress = (int)(bytesRead * 100 / contentBytes) + "% uploaded";
+			
+		response.getWriter().print(progress);
+		
+		return;
+	}			
 	
 	// uploading?
 	if ( ServletFileUpload.isMultipartContent(request) && (version <= 0) )
@@ -159,6 +174,7 @@ try
 	
 			// Create a new file upload handler
 			ServletFileUpload upload = new ServletFileUpload(factory);
+			upload.setProgressListener(new FileUploadProgressListener(request.getSession()));
 			log.info("upload handler created");
 	
 			// Parse the request
@@ -168,6 +184,8 @@ try
 				log.info("item: " + item.getFieldName());
 				items.put(item.getFieldName(), item);
 			}
+			
+			//TimeUtils.delay(3000);
 			
 			// get period
 			int						period = 0; // default
@@ -224,6 +242,8 @@ try
 		} catch (Throwable e) {
 			log.error("upload failed", e);
 		}
+
+		//TimeUtils.delay(3000);
 
 		// redirect to view page
 		log.info("redirecting");
@@ -283,6 +303,7 @@ try
         	padding-bottom: 5px;
         }
         div.ctrl2 {
+        	background: #8AC8F6;
         	border-top: 1px solid #99CCFF;
         }
         div.button_div {
@@ -318,14 +339,14 @@ try
         div.data_img img {
         }
         div.data_varsize {
-        	//display: inline;
+        	/*display: inline;*/
         	overflow: hidden;
-        	//white-space: nowrap;
+        	/*white-space: nowrap;*/
         }
         div.data_varsize p {
-        	//display: inline;
+        	/*display: inline;*/
         	overflow: hidden;
-        	//white-space: nowrap;
+        	/*white-space: nowrap;*/
         }
         
         div#gen2 {
@@ -361,7 +382,7 @@ try
 	<%=addGen2(request, q, qid, version, cdnUrl, rootPath) %>
 
 	<div class="data">
-	<form method="post" enctype="multipart/form-data" action="<%=q.getQ()%>" acceptcharset="UTF-8">
+	<form id="form" method="post" enctype="multipart/form-data" action="<%=q.getQ()%>" acceptcharset="UTF-8" onsubmit="javascript:form_submit()">
 	<input type="hidden" name="upload" value="1"/>
 	<%
 	if ( q.getTextData() != null && request.getParameter("edit") != null ) {
@@ -391,6 +412,8 @@ try
 	<% } %>
 	<div class="button_div">
 		<input type="submit" name="post" value="Post"/>
+	</div>
+	<div class="progress" id="progress">
 	</div>
 	</form>
 	</div>
@@ -884,6 +907,46 @@ try
 			window.location.href = url;			
 		}
 		
+		function form_submit()
+		{
+			try
+			{
+				var			file = $("#file")[0].value;
+			
+				if ( file != null && file.length != 0 )
+				{
+					$("#form")[0].target = "hidden-form";
+					update_progress();	
+				}
+					
+			} catch (e) {
+				
+			}
+			
+			return true;
+		}
+		
+		var form_submitted = null;
+		
+		function update_progress()
+		{
+			var		url = '<%=rootPath%>q/<%=qid%>?progress';
+			
+			form_submitted = true;
+			
+			url = "?progress";
+			
+			$("#progress").load(url, function() {
+				window.setTimeout(update_progress, 500);
+			});
+		}
+		
+		function iframe_loaded()
+		{
+			if ( form_submitted != null )
+				window.location.href = '<%=qid%>';			
+		}
+		
 		</script>
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
@@ -897,6 +960,8 @@ try
 		  ga('send', 'pageview');
 		
 		</script>
+		
+		<IFRAME style="display:none" name="hidden-form" onload="javascript:iframe_loaded()"></IFRAME> 
     </body>
 </html><%
 	

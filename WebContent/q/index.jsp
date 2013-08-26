@@ -971,6 +971,9 @@ try
 			}
 			*/
 			
+			$("#progress").html('<img height="32" src="<%=cdnUrl%>img/more/progress_indicator.gif"/>');
+			//alert($("#progress").html());
+			
 			return true;
 		}
 		

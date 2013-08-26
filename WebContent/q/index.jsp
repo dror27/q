@@ -1,5 +1,4 @@
-<%@page import="com.google.zxing.client.result.URLTOResultParser"%>
-<%@page import="com.nightox.q.html.ImgRenderer"%><%@page import="org.hibernate.criterion.Projections"%><%@page import="org.hibernate.criterion.Projection"%><%@page import="org.hibernate.Criteria"%><%@page import="java.text.SimpleDateFormat"%><%@page import="java.text.DateFormat"%><%@page import="org.hibernate.criterion.Order"%><%@page import="java.util.Date"%><%@page import="org.hibernate.criterion.Restrictions"%><%@page import="java.io.InputStream"%><%@page import="com.nightox.q.logic.LeaseManager"%><%@page import="java.text.DecimalFormat"%><%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringEscapeUtils"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
+<%@page import="com.google.zxing.client.result.URLTOResultParser"%><%@page import="com.nightox.q.html.ImgRenderer"%><%@page import="org.hibernate.criterion.Projections"%><%@page import="org.hibernate.criterion.Projection"%><%@page import="org.hibernate.Criteria"%><%@page import="java.text.SimpleDateFormat"%><%@page import="java.text.DateFormat"%><%@page import="org.hibernate.criterion.Order"%><%@page import="java.util.Date"%><%@page import="org.hibernate.criterion.Restrictions"%><%@page import="java.io.InputStream"%><%@page import="com.nightox.q.logic.LeaseManager"%><%@page import="java.text.DecimalFormat"%><%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringEscapeUtils"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
 
 final Log			log = LogFactory.getLog(this.getClass());
 
@@ -328,6 +327,11 @@ try
         	overflow: hidden;
         	//white-space: nowrap;
         }
+        
+        div#gen2 {
+        	padding-left: 5px;
+        }
+        
         </style>
     </head>
     <body onload="data_onload()">
@@ -348,12 +352,13 @@ try
 		<% if ( versionCount > 1 ) { %>
 		<a title="inspect" href="#" x-lock="0" onclick="toggle_elem('#ctrl2'); return false"><img src="<%=cdnUrl%>img/icons/glyphish/12-eye.png"/></a>
 		<% }  %>
-		<a title="print" href="<%=rootPath%>" target="_blank" style="float:right"><img src="<%=cdnUrl%>img/icons/glyphish/10-medical.png"/></a>
+		<a title="print" href="#" x-lock="0" style="float:right" onclick="toggle_elem('#gen2'); return false"><img src="<%=cdnUrl%>img/icons/glyphish/10-medical.png"/></a>
 	</div>
 
 	<% if ( versionCount > 1 ) { %>
 		<%=addCtrl2(request, q, qid, version, cdnUrl, false) %>
 	<% } %>
+	<%=addGen2(request, q, qid, version, cdnUrl, rootPath) %>
 
 	<div class="data">
 	<form method="post" enctype="multipart/form-data" action="<%=q.getQ()%>" acceptcharset="UTF-8">
@@ -405,7 +410,7 @@ try
 			<% } %> 
 			<a title="inspect" href="#" x-lock="0" onclick="toggle_elem('#ctrl2'); return false"><img src="<%=cdnUrl%>img/icons/glyphish/12-eye.png"/></a>
 			<% } %> 
-		<a href="<%=rootPath%>" target="_blank" style="float:right"><img src="<%=cdnUrl%>img/icons/glyphish/10-medical.png"/></a>
+		<a title="print" href="#" x-lock="0" style="float:right" onclick="toggle_elem('#gen2'); return false"><img src="<%=cdnUrl%>img/icons/glyphish/10-medical.png"/></a>
 		
 		<%
 		if ( request.getParameter("source") == null && request.getParameter("lease") == null)
@@ -427,6 +432,7 @@ try
 	<% if ( request.getParameter("source") == null && request.getParameter("lease") == null ) { %>
 		<%=addCtrl2(request, q, qid, version, cdnUrl, true) %>
 	<% } %>
+	<%=addGen2(request, q, qid, version, cdnUrl, rootPath) %>
 
 	<% if ( adsense ) { %>
 	<div id="adsense">
@@ -907,6 +913,42 @@ finally
 %>
 
 <%!
+public String addGen2(HttpServletRequest request, Q q, String qid, int version, String cdnUrl, String rootPath)
+{
+	StringBuilder		sb = new StringBuilder();
+
+	sb.append("<div class=\"ctrl ctrl2\" id=\"gen2\" style=\"display:none\">");
+	
+	sb.append("Generate &amp; Spread The Love!<br/>");
+	
+	sb.append("<form action=\"" + rootPath + "\" target=\"_blank\">");
+
+	sb.append("<select name=\"layout\">");
+	sb.append("<option value=\"\">layout ...</option>");
+	sb.append("<option value=\"1x1\">Full Pager - 1x1</option>");
+	sb.append("<option value=\"1x2\">Pairing Up - 1x2</option>");
+	sb.append("<option value=\"2x3\">Six Pack - 2x3</option>");
+	sb.append("<option value=\"3x4\">Dozen Eggs - 3x4</option>");
+	sb.append("<option value=\"7x10\">Tiny Desk - 7x10</option>");
+	sb.append("</select> (all optional)");
+
+	sb.append("<br/>");
+	sb.append("<input name=\"caption\" placeholder=\"bottom caption text\"/> (english)");
+	
+	sb.append("<br/>");
+	sb.append("<input name=\"image\" placeholder=\"center image url\"/> (square better)");
+	
+	sb.append("<br/>");
+	sb.append("<input type=\"submit\" value=\"Go!\">");
+
+	
+	sb.append("</form>");
+
+	sb.append("</div>");
+	
+	return sb.toString();
+}
+
 public String addCtrl2(HttpServletRequest request, Q q, String qid, int version, String cdnUrl, boolean showViewSource)
 {
 	StringBuilder		sb = new StringBuilder();

@@ -75,7 +75,8 @@ public class BasicPageGenerator {
 		document.addPage(page);
 
 		// create a new font object selecting one of the PDF base fonts
-		PDFont 			font = PDType1Font.HELVETICA_BOLD;
+		PDFont 			font2 = PDType1Font.HELVETICA_BOLD;
+		PDFont 			font = new PDType1Font( "Arial" );
 
         // load image
         PDXObjectImage 		centerImage = null;
@@ -247,6 +248,14 @@ public class BasicPageGenerator {
 
 	public void setCodeCols(int codeCols) {
 		this.codeCols = codeCols;
+	}
+
+	public String getNoteText() {
+		return noteText;
+	}
+
+	public void setNoteText(String noteText) {
+		this.noteText = noteText;
 	}
 
 }

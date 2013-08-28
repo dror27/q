@@ -9,15 +9,34 @@
 		<property name="keyword"/>
 	</class>
 	
+	<class name="com.nightox.q.model.m.QNoBlobs" table="qs">
+		<id name="id" column="id">
+			<generator class="increment"/>
+		</id>	
+		<property name="q"/>
+		<property name="dataType" column="data_type"/>
+		<property name="contentType" column="content_type"/>
+		<property name="textData" column="text_data" lazy="true"/>
+		
+		<property name="latitude"/>
+		<property name="longitude"/>
+		<property name="altitude"/>
+
+		<property name="version"/>
+		<property name="leaseHolder" column="lease_holder"/>
+		<property name="leaseStartedAt" column="lease_started_at"/>
+		<property name="leaseEndsAt" column="lease_ends_at"/>
+	</class>
+
 	<class name="com.nightox.q.model.m.Q" table="qs">
 		<id name="id" column="id">
 			<generator class="increment"/>
 		</id>	
 		<property name="q"/>
 		<property name="dataType" column="data_type"/>
-		<property name="binaryData" column="binary_data"/>
+		<property name="binaryData" column="binary_data" lazy="true" />
 		<property name="contentType" column="content_type"/>
-		<property name="textData" column="text_data"/>
+		<property name="textData" column="text_data" lazy="true"/>
 		
 		<property name="latitude"/>
 		<property name="longitude"/>
@@ -29,7 +48,6 @@
 		<property name="leaseEndsAt" column="lease_ends_at"/>
 	</class>
 	
-
 	<!-- 
 		generic mappings follow 
 	-->

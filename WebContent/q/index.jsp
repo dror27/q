@@ -1,4 +1,4 @@
-<%@page import="com.nightox.q.servlets.FileUploadProgressListener"%><%@page import="com.nightox.q.utils.TimeUtils"%><%@page import="com.nightox.q.utils.DateUtils"%><%@page import="com.google.zxing.client.result.URLTOResultParser"%><%@page import="com.nightox.q.html.ImgRenderer"%><%@page import="org.hibernate.criterion.Projections"%><%@page import="org.hibernate.criterion.Projection"%><%@page import="org.hibernate.Criteria"%><%@page import="java.text.SimpleDateFormat"%><%@page import="java.text.DateFormat"%><%@page import="org.hibernate.criterion.Order"%><%@page import="java.util.Date"%><%@page import="org.hibernate.criterion.Restrictions"%><%@page import="java.io.InputStream"%><%@page import="com.nightox.q.logic.LeaseManager"%><%@page import="java.text.DecimalFormat"%><%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringEscapeUtils"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
+<%@page import="com.nightox.q.model.m.QNoBlobs"%><%@page import="org.hibernate.FetchMode"%><%@page import="com.nightox.q.servlets.FileUploadProgressListener"%><%@page import="com.nightox.q.utils.TimeUtils"%><%@page import="com.nightox.q.utils.DateUtils"%><%@page import="com.google.zxing.client.result.URLTOResultParser"%><%@page import="com.nightox.q.html.ImgRenderer"%><%@page import="org.hibernate.criterion.Projections"%><%@page import="org.hibernate.criterion.Projection"%><%@page import="org.hibernate.Criteria"%><%@page import="java.text.SimpleDateFormat"%><%@page import="java.text.DateFormat"%><%@page import="org.hibernate.criterion.Order"%><%@page import="java.util.Date"%><%@page import="org.hibernate.criterion.Restrictions"%><%@page import="java.io.InputStream"%><%@page import="com.nightox.q.logic.LeaseManager"%><%@page import="java.text.DecimalFormat"%><%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringEscapeUtils"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
 
 final Log			log = LogFactory.getLog(this.getClass());
 log.debug("starting: " + request.getPathInfo() + ", " + request.getQueryString());
@@ -74,6 +74,7 @@ try
 		{
 			q = (Q)Database.getSession().createCriteria(Q.class)
 					.add(Restrictions.eq("q", qid))
+					.add(Restrictions.eq("dataType", "post"))
 					.add(Restrictions.eq("version", version))
 					.uniqueResult();
 			if ( q == null )
@@ -83,6 +84,7 @@ try
 		// fetch?
 		q0 = (Q)Database.getSession().createCriteria(Q.class)
 					.add(Restrictions.eq("q", qid))
+					.add(Restrictions.eq("dataType", "post"))
 					.add(Restrictions.isNull("version"))
 					.uniqueResult();
 		if ( q == null )
@@ -163,6 +165,8 @@ try
 	// uploading?
 	if ( ServletFileUpload.isMultipartContent(request) && (version <= 0) )
 	{
+		boolean			redirect = true;
+		
 		try
 		{
 			// starting upload
@@ -194,7 +198,7 @@ try
 				items.put(item.getFieldName(), item);
 			}
 			
-			TimeUtils.delay(3000);
+			//TimeUtils.delay(3000);
 			
 			// get period
 			int						period = 0; // default
@@ -204,18 +208,24 @@ try
 			// must have upload field
 			if ( items.containsKey("upload") )
 			{
+				if ( !items.get("upload").getString("UTF-8").trim().equals("1") )
+					redirect = false;
+				
 				// extract info
 				String				text = items.get("text").getString("UTF-8").trim();
 				InputStream			fileInputStream = null;
 				String				fileContentType = null;
+				long				size = 0;
 				if ( items.containsKey("file") 
 						&& !StringUtils.isEmpty(items.get("file").getContentType()) 
-						&& items.get("file").getSize() > 0 )
+						&& (size = items.get("file").getSize()) > 0 )
 				{
 					fileInputStream = items.get("file").getInputStream();
 					fileContentType = items.get("file").getContentType();
 				}
 				boolean				hasContent = (text.length() > 0) || (fileInputStream != null) || (q.getContentType() != null);
+				if ( size > 16000000 )
+					hasContent = false;
 				/*
 				if ( fileContentType != null && !ImgRenderer.isImageContentType(fileContentType) )
 					hasContent = false;
@@ -252,12 +262,19 @@ try
 			log.error("upload failed", e);
 		}
 
-		TimeUtils.delay(3000);
+		//TimeUtils.delay(3000);
 
 		// redirect to view page
 		request.getSession().setAttribute("_progress", null);
-		log.debug("redirecting");
-		response.sendRedirect(q.getQ());
+		if ( redirect )
+		{
+			log.debug("redirecting");
+			response.sendRedirect(q.getQ());
+		}
+		else
+		{
+			response.getWriter().println("OK");
+		}
 		return;
 	}
 	
@@ -392,8 +409,8 @@ try
 	<%=addGen2(request, q, qid, version, cdnUrl, rootPath) %>
 
 	<div class="data">
-	<form id="form" method="post" enctype="multipart/form-data" action="<%=q.getQ()%>" acceptcharset="UTF-8" onsubmit="javascript:form_submit()">
-	<input type="hidden" name="upload" value="1"/>
+	<form id="form" method="post" enctype="multipart/form-data" action="<%=q.getQ()%>" acceptcharset="UTF-8" onsubmit="return form_submit()">
+	<input type="hidden" name="upload" id="upload" value="1"/>
 	<%
 	if ( q.getTextData() != null && request.getParameter("edit") != null ) {
 		%><input type="hidden" name="edit" value="1"/><%
@@ -421,12 +438,11 @@ try
 	</div>
 	<% } %>
 	<div class="button_div">
-		<input type="submit" name="post" value="Post"/>
-	</div>
-	<div class="progress" id="progress">
+		<input type="submit" name="post" id="post" value="Post"/> <img id="progress" height="20" style="visibility:hidden" src="<%=cdnUrl%>img/more/progress_indicator.gif"/>
 	</div>
 	</form>
 	</div>
+	<iframe name="upload_frame" id="upload_frame" style="display:none"></iframe>
 <% } else {	%>
 	<div class="ctrl">
 		<% if ( request.getParameter("source") != null || request.getParameter("lease") != null ) { %>
@@ -917,8 +933,12 @@ try
 			window.location.href = url;			
 		}
 		
+		var form_submitted = null;
+
 		function form_submit()
 		{
+			if ( form_submitted )
+				return false;
 			/*
 			try
 			{
@@ -971,13 +991,43 @@ try
 			}
 			*/
 			
-			$("#progress").html('<img height="32" src="<%=cdnUrl%>img/more/progress_indicator.gif"/>');
+			
+			try
+			{
+				$("#progress").css("visibility", "");
+				form_submitted = true;
+				$("#file")[0].readOnly = true;
+				$("#text")[0].readOnly = true;
+				if ( $("#period").length > 0 )
+					$("#period")[0].readOnly = true;
+				window.setTimeout(function() {$("#post")[0].disabled = true;}, 1000);
+				
+				$("#upload_frame")[0].onload = upload_frame_onload;
+				
+				$("#form")[0].target = "upload_frame";
+				
+				$("#upload")[0].value = "2";
+			} catch (e)
+			{
+				console.log(e);
+			}
+			//alert($("#progress").css("display"));
 			//alert($("#progress").html());
 			
 			return true;
 		}
 		
-		var form_submitted = null;
+		
+		function upload_frame_onload()
+		{
+			//alert("upload_frame_onload: " + form_submitted);
+			
+			if ( form_submitted )
+			{
+				window.location.href = '<%=qid%>';
+			}
+		}
+		
 		
 		
 		function update_progress()
@@ -1070,7 +1120,8 @@ public String addCtrl2(HttpServletRequest request, Q q, String qid, int version,
 	if ( showViewSource )
 		sb.append("<a title=\"source\" href=\"" + sourceUrl + "\"><img src=\"" + cdnUrl + "img/icons/glyphish/179-notepad.png\"/></a>");
 		
-	List<Q>		past = Database.getSession().createCriteria(Q.class)
+	Criteria		crit = Database.getSession().createCriteria(QNoBlobs.class);
+	List<QNoBlobs>	past = crit
 											.add(Restrictions.eq("q", qid))
 											.add(Restrictions.isNotNull("version"))
 											.add(Restrictions.eq("dataType", "post"))
@@ -1087,7 +1138,7 @@ public String addCtrl2(HttpServletRequest request, Q q, String qid, int version,
 
 		DateFormat		df = new SimpleDateFormat("dd/MM");
 		int				limit = 18;
-		for ( Q q1 : past ) 
+		for ( QNoBlobs q1 : past ) 
 		{
 			String		preview = "";
 			if ( q1.getLeaseStartedAt() != null )

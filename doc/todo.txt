@@ -1,4 +1,5 @@
 -- high priority --
+[ ] center image can only be jpg
 
 -- done --
 [x] unify all links (youtube, soundcloud, etc) into one?

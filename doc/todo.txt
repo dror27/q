@@ -4,7 +4,7 @@
 [x] allow for image upload 
 [ ] why does it work and not work at times
 [x] provide an easy access to to generate on web
-[ ] make generation adjust even margin w/ spacing
+[x] make generation adjust even margin w/ spacing
 [x] generate center image from uploaded file
 
 -- done --

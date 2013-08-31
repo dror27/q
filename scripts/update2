@@ -15,3 +15,9 @@ rm -r $TOMCAT/webapps/ROOT*
 cp ../build/latest/q.war $TOMCAT/webapps/ROOT.war
 
 service tomcat7 start
+
+sleep 4
+curl -s localhost:8080//api/nop
+
+sleep 4
+curl -s localhost:8080//api/nop

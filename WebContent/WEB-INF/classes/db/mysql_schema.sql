@@ -45,6 +45,7 @@ CREATE TABLE `qs` (
 /*!40000 ALTER TABLE `keywords` DISABLE KEYS */;
 /*!40000 ALTER TABLE `keywords` ENABLE KEYS */;
 
+create unique index qs_1 on qs (q,data_type,version);
 
 
 

@@ -1,5 +1,7 @@
 -- high priority --
 [ ] center image can only be jpg
+[ ] youtube link may include [www.] prefix
+[ ] why does it work and not work at times
 
 -- done --
 [x] unify all links (youtube, soundcloud, etc) into one?

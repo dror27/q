@@ -54,6 +54,9 @@ if ( ServletFileUpload.isMultipartContent(request) )
 		if ( items.containsKey("image") && !StringUtils.isEmpty(items.get("image").getString("UTF-8")) )
 			centerImageUrl = items.get("image").getString("UTF-8");
 		
+		if ( items.containsKey("style") && !StringUtils.isEmpty(items.get("style").getString("UTF-8")) )
+			generator.setDotStyle(BasicPageGenerator.DotStyle.valueOf(items.get("style").getString("UTF-8")));
+
 		// must have file field
 		if ( items.containsKey("file") )
 		{
@@ -98,6 +101,9 @@ else
 		
 		if ( !StringUtils.isEmpty(request.getParameter("image")) )
 			centerImageUrl = request.getParameter("image");
+		
+		if ( !StringUtils.isEmpty(request.getParameter("style")) )
+			generator.setDotStyle(BasicPageGenerator.DotStyle.valueOf(request.getParameter("style")));
 		
 	} catch (Throwable e)
 	{

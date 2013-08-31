@@ -26,7 +26,7 @@ import com.google.zxing.qrcode.encoder.QRCode;
 
 public class BasicPageGenerator {
 	
-	enum DotStyle
+	public enum DotStyle
 	{
 		SQUARE,
 		DOT,
@@ -35,7 +35,7 @@ public class BasicPageGenerator {
 	}
 	
 	private String		baseUrl = "http://nightox.com/q/";
-	private String		noteText = "#Nightox";
+	private String		noteText = "eXPRESS yOURSELF nOW";
 	private	int			codeRows = 3;
 	private int			codeCols = 2;
 	private float		spacingRatio = 0.20f;
@@ -45,7 +45,9 @@ public class BasicPageGenerator {
 	private float		noteSpacing = 0.8f;
 	private DotStyle	dotStyle = DotStyle.SQUARE;
 	private int			centerImageDotSize = 7;
-
+	private boolean		spreadSpacing = true;
+	private float		spreadPaddingRatio = 0.00f;
+	
 	public static void main(String[] args) 
 	{
 		// extract args
@@ -75,7 +77,6 @@ public class BasicPageGenerator {
 		document.addPage(page);
 
 		// create a new font object selecting one of the PDF base fonts
-		PDFont 			font2 = PDType1Font.HELVETICA_BOLD;
 		PDFont 			font = new PDType1Font( "Arial" );
 
         // load image
@@ -90,25 +91,50 @@ public class BasicPageGenerator {
 		// determine bounding box
         PDRectangle 		pageSize = page.findMediaBox();
 		PDRectangle			boundingBox = new PDRectangle(pageSize.getWidth(), pageSize.getHeight());
-		boundingBox.setLowerLeftX(marginX);
-		boundingBox.setLowerLeftY(marginY);
-		boundingBox.setUpperRightX(boundingBox.getUpperRightX() - marginX);
-		boundingBox.setUpperRightY(boundingBox.getUpperRightY() - marginY);
 		
-		// determine size of code and spacing
-		float				spacedCols = ((codeCols - 1) * (1 + spacingRatio) + 1);
-		float				spacedRows = ((codeRows - 1) * (1 + spacingRatio) + 1);
-		float				codeSizeX = boundingBox.getWidth() / spacedCols;
-		float				codeSizeY = boundingBox.getHeight() / spacedRows;
-		float				codeSize = Math.min(codeSizeX, codeSizeY);
+		// declare some vars
+		float				spacedCols;
+		float				spacedRows;
+		float				codeSizeX;
+		float				codeSizeY;
+		float				codeSize;
+		float				spacingX = 0;
+		float				spacingY = 0;
 		
-		// adjust bounding box
-		float				paddingX = (boundingBox.getWidth() - codeSize * spacedCols) / 2;
-		float				paddingY = (boundingBox.getHeight() - codeSize * spacedRows) / 2;
-		boundingBox.setLowerLeftX(boundingBox.getLowerLeftX() + paddingX);
-		boundingBox.setLowerLeftY(boundingBox.getLowerLeftY() + paddingY);
-		boundingBox.setUpperRightX(boundingBox.getUpperRightX() - paddingX);
-		boundingBox.setUpperRightY(boundingBox.getUpperRightY() - paddingY);
+		if ( !spreadSpacing )
+		{
+			boundingBox.setLowerLeftX(marginX);
+			boundingBox.setLowerLeftY(marginY);
+			boundingBox.setUpperRightX(boundingBox.getUpperRightX() - marginX);
+			boundingBox.setUpperRightY(boundingBox.getUpperRightY() - marginY);
+		
+			// determine size of code and spacing
+			spacedCols = ((codeCols - 1) * (1 + spacingRatio) + 1);
+			spacedRows = ((codeRows - 1) * (1 + spacingRatio) + 1);
+			codeSizeX = boundingBox.getWidth() / spacedCols;
+			codeSizeY = boundingBox.getHeight() / spacedRows;
+			codeSize = Math.min(codeSizeX, codeSizeY);
+			
+			// adjust bounding box
+			float				paddingX = (boundingBox.getWidth() - codeSize * spacedCols) / 2;
+			float				paddingY = (boundingBox.getHeight() - codeSize * spacedRows) / 2;
+			boundingBox.setLowerLeftX(boundingBox.getLowerLeftX() + paddingX);
+			boundingBox.setLowerLeftY(boundingBox.getLowerLeftY() + paddingY);
+			boundingBox.setUpperRightX(boundingBox.getUpperRightX() - paddingX);
+			boundingBox.setUpperRightY(boundingBox.getUpperRightY() - paddingY);
+		}
+		else
+		{
+			spacedCols = codeCols * (1 + spacingRatio);
+			spacedRows = codeRows * (1 + spacingRatio);
+			codeSizeX = boundingBox.getWidth() / spacedCols;
+			codeSizeY = boundingBox.getHeight() / spacedRows;
+			codeSize = Math.min(codeSizeX, codeSizeY);
+			
+			spacingX = (boundingBox.getWidth() - (codeCols * codeSize)) / (codeCols);
+			spacingY = (boundingBox.getHeight() - (codeRows * codeSize)) / (codeRows);
+		}
+		
 		
 		// setup font size
 		float				fontSize = codeSize * fontSizeRatio;
@@ -128,9 +154,26 @@ public class BasicPageGenerator {
 				ByteMatrix	matrix = code.getMatrix();
 				
 				// establish base point & size
-				float		baseX = boundingBox.getLowerLeftX() + codeSize * (codeCol * (1 + spacingRatio));
-				float		baseY = boundingBox.getLowerLeftY() + codeSize * (codeRow * (1 + spacingRatio));
+				float		baseX, baseY;
+				if ( !spreadSpacing )
+				{
+					baseX = boundingBox.getLowerLeftX() + codeSize * (codeCol * (1 + spacingRatio));
+					baseY = boundingBox.getLowerLeftY() + codeSize * (codeRow * (1 + spacingRatio));
+				}
+				else
+				{
+					baseX = boundingBox.getLowerLeftX() + spacingX / 2 + (codeCol * (codeSize + spacingX)); 
+					baseY = boundingBox.getLowerLeftY() + spacingY / 2 + (codeRow * (codeSize + spacingY)); 
+				}
+				
 				float		size = codeSize / matrix.getWidth();
+				if ( spreadSpacing )
+				{
+					float		padding = size * spreadPaddingRatio;
+					size -= (padding * 2);
+					baseX += padding;
+					baseY += padding;
+				}
 
 				// write the note
 				contentStream.beginText();
@@ -256,6 +299,30 @@ public class BasicPageGenerator {
 
 	public void setNoteText(String noteText) {
 		this.noteText = noteText;
+	}
+
+	public boolean isSpreadSpacing() {
+		return spreadSpacing;
+	}
+
+	public void setSpreadSpacing(boolean spreadSpacing) {
+		this.spreadSpacing = spreadSpacing;
+	}
+
+	public float getSpreadPaddingRatio() {
+		return spreadPaddingRatio;
+	}
+
+	public void setSpreadPaddingRatio(float spreadPaddingRatio) {
+		this.spreadPaddingRatio = spreadPaddingRatio;
+	}
+
+	public DotStyle getDotStyle() {
+		return dotStyle;
+	}
+
+	public void setDotStyle(DotStyle dotStyle) {
+		this.dotStyle = dotStyle;
 	}
 
 }

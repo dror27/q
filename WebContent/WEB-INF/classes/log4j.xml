@@ -26,7 +26,9 @@
 	</logger>
 	<logger name="org.apache.jsp.q.index_jsp">
 		<level value="debug" />
-		<!-- <appender-ref ref="console" /> -->
+	</logger>
+	<logger name="org.apache.jsp.index_jsp">
+		<level value="debug" />
 	</logger>
 
 	<root>

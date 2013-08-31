@@ -1,4 +1,4 @@
-<%@page import="java.net.HttpURLConnection"%><%@page import="java.net.URL"%><%@page import="java.io.InputStream"%><%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="java.awt.font.NumericShaper"%><%@page import="org.bouncycastle.util.test.NumberParsing"%><%@page import="com.nightox.q.generate.BasicPageGenerator"%><%@ page language="java" contentType="application/pdf" pageEncoding="UTF-8"%><%
+<%@page import="java.io.ByteArrayInputStream"%><%@page import="java.io.ByteArrayOutputStream"%><%@page import="java.awt.image.BufferedImage"%><%@page import="javax.imageio.ImageIO"%><%@page import="java.awt.Image"%><%@page import="java.net.HttpURLConnection"%><%@page import="java.net.URL"%><%@page import="java.io.InputStream"%><%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="java.awt.font.NumericShaper"%><%@page import="org.bouncycastle.util.test.NumberParsing"%><%@page import="com.nightox.q.generate.BasicPageGenerator"%><%@ page language="java" contentType="application/pdf" pageEncoding="UTF-8"%><%
 
 BasicPageGenerator	generator = new BasicPageGenerator();
 final Log			log = LogFactory.getLog(this.getClass());
@@ -34,6 +34,8 @@ try
 	{
 		if ( !StringUtils.isEmpty(request.getParameter("image")) )
 		{
+			log.debug("image: " + request.getParameter("image"));
+			
 			URL					url = new URL(request.getParameter("image"));
 			HttpURLConnection	urlConnection = (HttpURLConnection)url.openConnection();
 			
@@ -41,12 +43,25 @@ try
 			urlConnection.connect();
 			
 			if ( urlConnection.getResponseCode() == 200 )
-				centerImage = urlConnection.getInputStream();
+			{
+				String		contentType = urlConnection.getContentType();
+				log.debug("contentType: " + contentType);
+				
+				BufferedImage		image = ImageIO.read(urlConnection.getInputStream());
+				log.debug("image size: " + image.getWidth() + "x" + image.getHeight());
+				
+				ByteArrayOutputStream jpegStream = new ByteArrayOutputStream();
+				boolean				writeResult = ImageIO.write(image, "jpg", jpegStream);
+				log.debug("writeResult: " + writeResult);
+				if ( writeResult )				
+					centerImage = new ByteArrayInputStream(jpegStream.toByteArray());
+			}
 		}
 	}
 	catch (Throwable e)
 	{
 		centerImage = null;	
+		log.error(e);
 	}
 	if ( centerImage == null )
 		centerImage = BasicPageGenerator.class.getClassLoader().getResourceAsStream("resources/Revolution-Fist-Small.jpg");

@@ -52,8 +52,10 @@ c.setMaxAge(Integer.MAX_VALUE);
 response.addCookie(c);
 
 // open database session
+log.debug("opening a session");
 ISessionManager				sessionManager = Database.getInstance().getSessionManager();
 IDatabaseSession			databaseSession = sessionManager.pushThreadSession();
+log.debug("session openned");
 
 // figure out if invoked by real path
 String[]					uriToks = request.getRequestURI().split("/");
@@ -70,6 +72,7 @@ try
 	if ( Factory.getServices().getqManager().isValidQ(qid) )
 	{
 		// fetch version?
+		log.debug("fetching version");
 		if ( version > 0 )
 		{
 			q = (Q)Database.getSession().createCriteria(Q.class)
@@ -82,6 +85,7 @@ try
 		}
 		
 		// fetch?
+		log.debug("fetching top version");
 		q0 = (Q)Database.getSession().createCriteria(Q.class)
 					.add(Restrictions.eq("q", qid))
 					.add(Restrictions.eq("dataType", "post"))
@@ -92,6 +96,7 @@ try
 		
 		if ( q == null )
 		{
+			log.debug("creating new");
 			q = new Q(qid);
 			q.save();
 			q.setDataType("post");
@@ -99,6 +104,7 @@ try
 		}
 		else
 		{
+			log.debug("counting versions");
 			versionCount = ((Integer)Database.getSession().createCriteria(Q.class)
 					.add(Restrictions.eq("q", qid))
 					.add(Restrictions.eq("dataType", "post"))
@@ -107,6 +113,7 @@ try
 
 		}
 	}
+	log.debug("fetching done");
 
 	// if we have no Q, escape to root
 	if ( q == null )
@@ -1067,8 +1074,10 @@ try
 }
 finally
 {
+	log.info("popping session");
 	sessionManager.popThreadSession();
 }
+log.debug("done");
 %>
 
 <%!

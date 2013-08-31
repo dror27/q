@@ -1,8 +1,11 @@
 -- high priority --
-[ ] center image can only be jpg
+[x] center image can only be jpg
 [x] youtube link may include [www.] prefix
+[x] allow for image upload 
 [ ] why does it work and not work at times
-[ ] provide an easy access to to generate on web
+[x] provide an easy access to to generate on web
+[ ] make generation adjust even margin w/ spacing
+[x] generate center image from uploaded file
 
 -- done --
 [x] unify all links (youtube, soundcloud, etc) into one?

@@ -17,8 +17,29 @@
     <servlet-name>QJsp</servlet-name>
     <url-pattern>/q/*</url-pattern>
   </servlet-mapping>
+
   <servlet-mapping>
     <servlet-name>QJsp</servlet-name>
     <url-pattern>/admin/qa/*</url-pattern>
   </servlet-mapping>
+
+  <servlet>
+    <servlet-name>FormJsp</servlet-name>
+    <jsp-file>/form.html</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>FormJsp</servlet-name>
+    <url-pattern>/form</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>GenerateJsp</servlet-name>
+    <jsp-file>/index.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GenerateJsp</servlet-name>
+    <url-pattern>/generate</url-pattern>
+  </servlet-mapping>
+
+
 </web-app>

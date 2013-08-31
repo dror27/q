@@ -11,7 +11,7 @@ cd scripts
 service tomcat7 stop
 sleep 4
 rm -r $TOMCAT/webapps/ROOT*
-rm -r $TOMCAT/logs/*
+#rm -r $TOMCAT/logs/*
 cp ../build/latest/q.war $TOMCAT/webapps/ROOT.war
 
 service tomcat7 start

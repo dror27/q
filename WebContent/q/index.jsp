@@ -1076,6 +1076,7 @@ finally
 {
 	log.info("popping session");
 	sessionManager.popThreadSession();
+	log.info("session popped");
 }
 log.debug("done");
 %>

@@ -15,7 +15,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>QJsp</servlet-name>
-    <url-pattern>/q/*</url-pattern>
+    <url-pattern>/q-1/*</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -24,7 +24,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>Q0Jsp</servlet-name>
-    <url-pattern>/q0/*</url-pattern>
+    <url-pattern>/q/*</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

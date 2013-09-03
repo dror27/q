@@ -133,10 +133,11 @@ try
     
     	<!-- status div -->
     	<div id="status-div" style="background:#C0C0C0"/>
-    		Total Versions: <%=Database.getSession().createCriteria(Q.class).setProjection(Projections.rowCount()).uniqueResult()%>
-    		| Top Versions: <%=Database.getSession().createCriteria(Q.class).add(Restrictions.isNull("version")).setProjection(Projections.rowCount()).uniqueResult()%>
+    		Total Versions: <%=Database.getSession().createCriteria(Q.class).add(Restrictions.eq("dataType", "post")).setProjection(Projections.rowCount()).uniqueResult()%>
+    		| Top Versions: <%=Database.getSession().createCriteria(Q.class).add(Restrictions.eq("dataType", "post")).add(Restrictions.isNull("version")).setProjection(Projections.rowCount()).uniqueResult()%>
     		<%
     			Q		latest = (Q)Database.getSession().createCriteria(Q.class)
+    								.add(Restrictions.eq("dataType", "post"))
     								.add(Restrictions.isNull("version"))
     								.addOrder(Order.desc("id"))
     								.setMaxResults(1).uniqueResult();

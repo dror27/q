@@ -18,6 +18,15 @@
     <url-pattern>/q/*</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <servlet-name>Q0Jsp</servlet-name>
+    <jsp-file>/q0/index.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Q0Jsp</servlet-name>
+    <url-pattern>/q0/*</url-pattern>
+  </servlet-mapping>
+
   <servlet-mapping>
     <servlet-name>QJsp</servlet-name>
     <url-pattern>/admin/qa/*</url-pattern>

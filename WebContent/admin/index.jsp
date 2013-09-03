@@ -1,3 +1,4 @@
+<%@page import="com.nightox.q.model.m.QNoBlobs"%>
 <%@page import="org.hibernate.criterion.Subqueries"%><%@page import="org.hibernate.criterion.DetachedCriteria"%><%@page import="com.nightox.q.html.ImgRenderer"%><%@page import="org.hibernate.criterion.Projections"%><%@page import="org.hibernate.criterion.Projection"%><%@page import="org.hibernate.Criteria"%><%@page import="java.text.SimpleDateFormat"%><%@page import="java.text.DateFormat"%><%@page import="org.hibernate.criterion.Order"%><%@page import="java.util.Date"%><%@page import="org.hibernate.criterion.Restrictions"%><%@page import="java.io.InputStream"%><%@page import="com.nightox.q.logic.LeaseManager"%><%@page import="java.text.DecimalFormat"%><%@page import="org.apache.commons.logging.LogFactory"%><%@page import="org.apache.commons.logging.Log"%><%@page import="org.apache.commons.lang.StringEscapeUtils"%><%@page import="org.apache.commons.lang.StringUtils"%><%@page import="com.freebss.sprout.banner.util.StreamUtils"%><%@page import="com.freebss.sprout.core.utils.QueryStringUtils"%><%@page import="java.util.LinkedHashMap"%><%@page import="java.util.LinkedList"%><%@page import="org.apache.commons.fileupload.FileItem"%><%@page import="java.util.List"%><%@page import="java.io.File"%><%@page import="org.apache.commons.fileupload.disk.DiskFileItemFactory"%><%@page import="org.apache.commons.fileupload.FileItemFactory"%><%@page import="org.apache.commons.fileupload.servlet.ServletFileUpload"%><%@page import="java.util.Map"%><%@page import="com.nightox.q.db.Database"%><%@page import="com.nightox.q.db.IDatabaseSession"%><%@page import="com.nightox.q.db.ISessionManager"%><%@page import="com.nightox.q.db.HibernateCodeWrapper"%><%@page import="com.nightox.q.model.base.DbObject"%><%@page import="com.nightox.q.beans.Services"%><%@page import="com.nightox.q.model.m.Q"%><%@page import="com.nightox.q.beans.Factory"%><%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
 
 final Log			log = LogFactory.getLog(this.getClass());
@@ -129,6 +130,26 @@ try
       document.write(script);
     </script>    </head>
     <body>
+    
+    	<!-- status div -->
+    	<div id="status-div" style="background:#C0C0C0"/>
+    		Total Versions: <%=Database.getSession().createCriteria(Q.class).setProjection(Projections.rowCount()).uniqueResult()%>
+    		| Top Versions: <%=Database.getSession().createCriteria(Q.class).add(Restrictions.isNull("version")).setProjection(Projections.rowCount()).uniqueResult()%>
+    		<%
+    			Q		latest = (Q)Database.getSession().createCriteria(Q.class)
+    								.add(Restrictions.isNull("version"))
+    								.addOrder(Order.desc("id"))
+    								.setMaxResults(1).uniqueResult();
+				String		position1 = "";
+				if ( latest.getLatitude() != null && latest.getLongitude() != null )
+					position1 += latest.getLatitude() + "," + latest.getLongitude();
+	
+    		%>
+    		| Latest: <a target="_blank" href="qa/<%=latest.getQ()%>"><%=latest.getQ()%></a>
+			<% if ( !StringUtils.isEmpty(position1) ) { %>
+				(<a target="_blank" href="http://maps.google.com/?q=<%=position1%>"><%=position1%></a>)
+			<% } %>
+		</div>    	
     
     	<!-- query form -->
     	<div id="query-div"/>

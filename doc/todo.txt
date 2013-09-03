@@ -7,6 +7,9 @@
 [x] make generation adjust even margin w/ spacing
 [x] generate center image from uploaded file
 
+[ ] add mp3 player for such attachments (html5 player)
+[ ] password protect admin
+
 [x] http://m.youtube.com/watch?feature=related&v=Tf5cMsyCJrI
 [x] versions don't work on 694601798f5a490e9a231f2805215e6b (localhost) ?
 

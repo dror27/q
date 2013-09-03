@@ -446,7 +446,9 @@ try
 	</div>
 	<% } %>
 	<div class="button_div">
-		<input type="submit" name="post" id="post" value="Post"/> <img id="progress" height="20" style="visibility:hidden" src="<%=cdnUrl%>img/more/progress_indicator.gif"/>
+		<input type="submit" name="post" id="post" value="Post"/> 
+		<img id="progress" height="20" style="visibility:hidden" src="<%=cdnUrl%>img/more/progress_indicator.gif"/>
+		<span id="progress-text"></span>
 	</div>
 	</form>
 	</div>
@@ -1013,6 +1015,7 @@ try
                         if (e.lengthComputable) {
                             var loaded = Math.ceil((e.loaded / e.total) * 100);
                             console.log("loaded: " + loaded);
+                            $("#progress-text").text(loaded + "%");
                         }
                     }, false);
                     

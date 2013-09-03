@@ -135,11 +135,11 @@
 			<list>
 				<!-- youtube -->
 				<bean class="com.nightox.q.types.spec.QLinkTypeSpec">
-					<property name="pattern" value="(http:\/\/)?(((www\.)?youtube\.com\/watch\?v=)|(youtu\.be\/))([a-zA-z0-9_\-]{11})([&amp;%-_0-9a-zA-Z\.]*)"/>
+					<property name="pattern" value="(http:\/\/)?((((www)|m\.)?youtube\.com\/watch\?(.)*v=)|(youtu\.be\/))([a-zA-z0-9_\-]{11})([&amp;%-_0-9a-zA-Z\.]*)"/>
 					<property name="html">
 						<value>
 						<![CDATA[
-							<iframe class="video_iframe" width="100%" height="315" src="//www.youtube.com/embed/$6" frameborder="0" allowfullscreen></iframe>
+							<iframe class="video_iframe" width="100%" height="315" src="http://www.youtube.com/embed/$8" frameborder="0" allowfullscreen></iframe>
 						]]>
 						</value>
 					</property>

@@ -15,7 +15,7 @@ public class FileUploadProgressListener implements ProgressListener {
 	@Override
 	public void update(long pBytesRead, long pContentLength, int pItems) 
 	{
-		log.info("bytes: " + pBytesRead + ", length: " + pContentLength + ", items: " + pItems);
+		log.debug("bytes: " + pBytesRead + ", length: " + pContentLength + ", items: " + pItems);
 		
 		bytesRead = pBytesRead;
 		contentLength = pContentLength;

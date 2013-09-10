@@ -7,6 +7,8 @@
 [x] make generation adjust even margin w/ spacing
 [x] generate center image from uploaded file
 
+[ ] debug clear operation - should leave current version untouched and create a new version
+
 [ ] add mp3 player for such attachments (html5 player)
 [x] password protect admin
 
@@ -14,9 +16,9 @@
 [x] versions don't work on 694601798f5a490e9a231f2805215e6b (localhost) ?
 
 [ ] handle upload failures on client
-[ ] investigate failures over GSM (too slow? phone goes to sleep?)
-[ ] add progress reporting on client when possible
-[ ] add image downsize on client when possible
+[x] investigate failures over GSM (too slow? phone goes to sleep?)
+[x] add progress reporting on client when possible
+[x] add image downsize on client when possible
 
 [ ] add (push?) notification when something good happens
 

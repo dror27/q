@@ -13,6 +13,7 @@
 		<id name="id" column="id">
 			<generator class="increment"/>
 		</id>	
+				
 		<property name="q"/>
 		<property name="dataType" column="data_type"/>
 		<property name="contentType" column="content_type"/>
@@ -26,6 +27,7 @@
 		<property name="leaseHolder" column="lease_holder"/>
 		<property name="leaseStartedAt" column="lease_started_at"/>
 		<property name="leaseEndsAt" column="lease_ends_at"/>
+		
 	</class>
 
 	<class name="com.nightox.q.model.m.Q" table="qs">
@@ -47,7 +49,7 @@
 		<property name="leaseStartedAt" column="lease_started_at"/>
 		<property name="leaseEndsAt" column="lease_ends_at"/>
 	</class>
-	
+		
 	<!-- 
 		generic mappings follow 
 	-->

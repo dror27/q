@@ -9,22 +9,23 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
+  
   <servlet>
     <servlet-name>QJsp</servlet-name>
-    <jsp-file>/q/index.jsp</jsp-file>
+    <jsp-file>/q/index_1.jsp</jsp-file>
   </servlet>
   <servlet-mapping>
     <servlet-name>QJsp</servlet-name>
-    <url-pattern>/q-1/*</url-pattern>
+    <url-pattern>/q/*</url-pattern>
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>Q0Jsp</servlet-name>
-    <jsp-file>/q0/index.jsp</jsp-file>
+    <servlet-name>QDevelJsp</servlet-name>
+    <jsp-file>/q/index_1.jsp</jsp-file>
   </servlet>
   <servlet-mapping>
-    <servlet-name>Q0Jsp</servlet-name>
-    <url-pattern>/q/*</url-pattern>
+    <servlet-name>QDevelJsp</servlet-name>
+    <url-pattern>/qd/*</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

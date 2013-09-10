@@ -9,6 +9,12 @@
 
 [ ] debug clear operation - should leave current version untouched and create a new version
 
+[ ] soundcloud sets
+[ ] do link work inside text? how? syntax?
+
+[ ] http://m.soundcloud.com/capsouto/3-i-do does not work!
+[ ] set exprires aleways on all pages!
+
 [ ] add mp3 player for such attachments (html5 player)
 [x] password protect admin
 

@@ -159,7 +159,7 @@
 				
 				<!-- soundcloud -->
 				<bean class="com.nightox.q.types.spec.QLinkTypeSpec">
-					<property name="pattern" value="(https?:\/\/(?:www.)?soundcloud.com\/[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*(?!\/sets(?:\/|$))(?:\/[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*){1,2}\/?)([\/\?&amp;%-_0-9a-zA-Z\.]*)"/>
+					<property name="pattern" value="(https?:\/\/(?:(www.)|(m.))?soundcloud.com\/[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*(?!\/sets(?:\/|$))(?:\/[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*){1,2}\/?)([\/\?&amp;%-_0-9a-zA-Z\.]*)"/>
 					<property name="urlEncode" value="true"/>
 					<property name="html">
 						<value>

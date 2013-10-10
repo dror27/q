@@ -34,7 +34,12 @@ public class HtmlRenderer {
 			text = text.substring(1);
 			simple = true;
 		}
-		text = expandMarkdown(text);
+		if ( !StringUtils.isEmpty(text) )
+		{
+			text = expandMarkdown(text);
+			text.replace("fb: ", "fb:");
+		}
+		
 		if ( !!simple && StringUtils.isEmpty(text) )
 		{
 			// prepare a place for the embeds

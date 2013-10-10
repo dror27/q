@@ -37,7 +37,7 @@ public class HtmlRenderer {
 		if ( !StringUtils.isEmpty(text) )
 		{
 			text = expandMarkdown(text);
-			text.replace("fb: ", "fb:");
+			text = text.replace("fb: ", "fb:");
 		}
 		
 		if ( !!simple && StringUtils.isEmpty(text) )

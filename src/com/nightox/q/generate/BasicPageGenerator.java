@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Random;
 import java.util.UUID;
 
 import org.apache.pdfbox.exceptions.COSVisitorException;
@@ -34,6 +35,17 @@ public class BasicPageGenerator {
 		POLYGON2
 	}
 	
+	private Color[]		rainbowColors = 
+	{
+		new Color(0xFF0000),
+		new Color(0xFF7F00),
+		new Color(0xFFFF00),
+		new Color(0x00FF00),
+		new Color(0x0000FF),
+		new Color(0x4B0082),
+		new Color(0x8F00FF)
+	};
+	
 	private String		baseUrl = "http://nightox.com/q/";
 	private String		noteText = "eXPRESS yOURSELF nOW";
 	private	int			codeRows = 3;
@@ -47,6 +59,9 @@ public class BasicPageGenerator {
 	private int			centerImageDotSize = 7;
 	private boolean		spreadSpacing = true;
 	private float		spreadPaddingRatio = 0.00f;
+	private int			rainbow = 0;
+	
+	private Random		random = new Random();
 	
 	public static void main(String[] args) 
 	{
@@ -176,6 +191,8 @@ public class BasicPageGenerator {
 				}
 
 				// write the note
+				if ( rainbow != 0 )
+			        contentStream.setNonStrokingColor(Color.BLACK);
 				contentStream.beginText();
 				contentStream.moveTextPositionByAmount(baseX, baseY - fontSize * noteSpacing);
 				contentStream.drawString(noteText);
@@ -187,6 +204,9 @@ public class BasicPageGenerator {
 					{
 						float		x = baseX + col * size;
 						float		y = baseY + matrix.getHeight() * size - row * size;
+						
+						if ( rainbow != 0 )
+					        contentStream.setNonStrokingColor(rainbowColors[random.nextInt(rainbowColors.length)]);
 						
 						if ( matrix.get(col, row) != 0 )
 						{
@@ -325,4 +345,7 @@ public class BasicPageGenerator {
 		this.dotStyle = dotStyle;
 	}
 
+	public void setRainbow(int rainbow) {
+		this.rainbow = rainbow;
+	}
 }

@@ -29,7 +29,9 @@ public class HtmlRenderer {
 		// has text?
 		String					text = q.getTextData();
 		text = expandMarkdown(text);
-		if ( !StringUtils.isEmpty(text) )
+		if ( !StringUtils.isEmpty(text) && text.charAt(0) == '+' )
+			text = text.substring(1);
+		else if ( !StringUtils.isEmpty(text) )
 		{
 			// prepare a place for the embeds
 			List<String>		embeds = new LinkedList<String>();

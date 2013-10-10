@@ -57,6 +57,9 @@ if ( ServletFileUpload.isMultipartContent(request) )
 		if ( items.containsKey("style") && !StringUtils.isEmpty(items.get("style").getString("UTF-8")) )
 			generator.setDotStyle(BasicPageGenerator.DotStyle.valueOf(items.get("style").getString("UTF-8")));
 
+		if ( items.containsKey("rainbow") && !StringUtils.isEmpty(items.get("rainbow").getString("UTF-8")) )
+			generator.setRainbow(Integer.parseInt(items.get("rainbow").getString("UTF-8"))); 
+		
 		// must have file field
 		if ( items.containsKey("file") )
 		{
@@ -104,6 +107,9 @@ else
 		
 		if ( !StringUtils.isEmpty(request.getParameter("style")) )
 			generator.setDotStyle(BasicPageGenerator.DotStyle.valueOf(request.getParameter("style")));
+		
+		if ( !StringUtils.isEmpty(request.getParameter("rainbow")) )
+			generator.setRainbow(Integer.parseInt(request.getParameter("rainbow")));
 		
 	} catch (Throwable e)
 	{

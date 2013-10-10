@@ -55,6 +55,8 @@ public class HtmlRenderer {
 			}
 			sb.append(text);
 		}
+		else
+			sb.append(text);
 		
 		
 		return sb.toString();
